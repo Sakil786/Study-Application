@@ -2645,26 +2645,44 @@ function showMainApp() {
 
 // Check if Firebase is properly configured
 function isFirebaseConfigured() {
-  return firebaseConfig.apiKey !== "demo-api-key-replace-with-your-own";
+  return firebaseConfig.apiKey !== "demo-api-key-replace-with-your-own" && 
+         firebaseConfig.projectId !== "demo-project";
 }
 
 // Show configuration instructions if Firebase isn't set up
 function showFirebaseSetupInstructions() {
   el('authScreen').innerHTML = `
     <div class="auth-container">
-      <h1>🔧 Firebase Setup Required</h1>
+      <h1>🔧 Firebase Configuration Required</h1>
       <div class="message error show">
-        <strong>Firebase Configuration Needed</strong><br><br>
-        To use this application, you need to:
+        <strong>Environment Variables Not Set</strong><br><br>
+        This app uses Firebase for authentication and data storage. To get started:
         <ol style="margin: 10px 0 0 20px; padding: 0;">
           <li>Create a Firebase project at <a href="https://console.firebase.google.com" target="_blank" style="color: var(--forest);">console.firebase.google.com</a></li>
-          <li>Enable Authentication (Email/Password)</li>
-          <li>Create a Firestore database</li>
-          <li>Replace the firebaseConfig in the HTML with your project's config</li>
+          <li>Enable Authentication (Email/Password) and Firestore</li>
+          <li>Set environment variables in Vercel dashboard:</li>
         </ol>
+        <div style="background: #f8f9fa; border-radius: 6px; padding: 12px; margin: 12px 0; font-family: monospace; font-size: 12px;">
+          VITE_FIREBASE_API_KEY=your-api-key<br>
+          VITE_FIREBASE_AUTH_DOMAIN=project.firebaseapp.com<br>
+          VITE_FIREBASE_PROJECT_ID=your-project-id<br>
+          VITE_FIREBASE_STORAGE_BUCKET=project.appspot.com<br>
+          VITE_FIREBASE_MESSAGING_SENDER_ID=123456789<br>
+          VITE_FIREBASE_APP_ID=1:123456789:web:app-id
+        </div>
       </div>
-      <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; font-size: 13px;">
-        <strong>Demo Mode Available:</strong> For now, you can use the localStorage version by refreshing the page and using Option 1 instead.
+      <div style="margin-top: 20px;">
+        <a href="https://github.com/Sakil786/Study-Application/blob/main/FIREBASE_SETUP.md" 
+           target="_blank" 
+           class="btn full-width" 
+           style="text-decoration: none; display: block; text-align: center;">
+          📖 View Detailed Setup Guide
+        </a>
+      </div>
+      <div style="margin-top: 16px; text-align: center;">
+        <button onclick="location.reload()" class="btn secondary" style="width: auto;">
+          🔄 Check Configuration
+        </button>
       </div>
     </div>
   `;

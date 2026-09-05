@@ -1,6 +1,6 @@
-# 🔥 Firebase Setup Instructions
+# 🔥 Firebase Setup with Environment Variables
 
-To enable the full Firebase-powered Study Log application, you need to create your own Firebase project and configure it. This is **free** and takes about 5-10 minutes.
+To enable the full Firebase-powered Study Log application, you need to create your own Firebase project and configure it using secure environment variables. This is **free** and takes about 5-10 minutes.
 
 ## 📋 Step-by-Step Setup
 
@@ -34,22 +34,34 @@ To enable the full Firebase-powered Study Log application, you need to create yo
 5. Register your app with nickname: `study-log-web`
 6. **Don't check** "Also set up Firebase Hosting"
 7. Click "Register app"
-8. **Copy the firebaseConfig object**
+8. **Copy the firebaseConfig object values**
 
-### 5. Update Your Code
-1. Open your `index.html` file
-2. Find this section around line 200:
-```javascript
-const firebaseConfig = {
-  apiKey: "demo-api-key-replace-with-your-own",
-  authDomain: "demo-project.firebaseapp.com",
-  projectId: "demo-project",
-  // ... other demo values
-};
+### 5. Configure Environment Variables
+
+#### For Vercel Deployment (Recommended):
+1. Go to your Vercel dashboard
+2. Select your Study Log project
+3. Go to "Settings" → "Environment Variables"
+4. Add these variables with your Firebase config values:
+
 ```
-3. Replace the entire `firebaseConfig` object with your copied configuration
+VITE_FIREBASE_API_KEY=your-api-key-here
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=123456789
+VITE_FIREBASE_APP_ID=1:123456789:web:your-app-id
+```
 
-### 6. Set Up Security Rules (Optional but Recommended)
+5. Redeploy your application (Vercel will do this automatically)
+
+#### For Local Development:
+1. Copy `.env.example` to `.env`
+2. Fill in your Firebase configuration values
+3. Run `npm run build` to build with your config
+4. Run `npm run dev` to test locally
+
+### 6. Set Up Security Rules (Recommended)
 1. Go back to Firestore Database in Firebase Console
 2. Click "Rules" tab
 3. Replace the rules with:
@@ -79,11 +91,37 @@ service cloud.firestore {
 ## 🎉 You're Done!
 
 Your Study Log application now has:
+- ✅ **Secure environment-based configuration**
 - ✅ **Real user authentication** (secure signup/login)
 - ✅ **Cloud database** (data syncs across devices)
 - ✅ **Multi-user support** (each user has private data)
 - ✅ **Automatic backups** (Google's infrastructure)
 - ✅ **Cross-device sync** (same data on phone, laptop, tablet)
+
+## 🚀 Vercel Environment Variables Setup
+
+After creating your Firebase project:
+
+1. **Go to Vercel Dashboard**
+   - Visit [vercel.com/dashboard](https://vercel.com/dashboard)
+   - Select your Study Log project
+
+2. **Add Environment Variables**
+   - Go to Settings → Environment Variables
+   - Add each Firebase config value:
+
+| Variable Name | Example Value | Description |
+|---------------|---------------|-------------|
+| `VITE_FIREBASE_API_KEY` | `AIzaSyC...` | Firebase API Key |
+| `VITE_FIREBASE_AUTH_DOMAIN` | `myapp.firebaseapp.com` | Auth Domain |
+| `VITE_FIREBASE_PROJECT_ID` | `my-study-app` | Project ID |
+| `VITE_FIREBASE_STORAGE_BUCKET` | `myapp.appspot.com` | Storage Bucket |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | `123456789` | Sender ID |
+| `VITE_FIREBASE_APP_ID` | `1:123:web:abc123` | App ID |
+
+3. **Deploy**
+   - Vercel will automatically redeploy with your Firebase config
+   - Your app will be ready to use immediately!
 
 ## 💰 Cost Information
 
@@ -96,39 +134,30 @@ Your Study Log application now has:
 - Daily usage: ~10 reads, ~5 writes
 - **You'll use less than 1% of free limits!**
 
-## 🚀 Deploy to Production
-
-### Option 1: Vercel (Current)
-Your app will work on Vercel immediately after Firebase configuration.
-
-### Option 2: Firebase Hosting (Alternative)
-1. Install Firebase CLI: `npm install -g firebase-tools`
-2. Login: `firebase login`
-3. Initialize: `firebase init hosting`
-4. Select your project
-5. Set public directory: `.` (current directory)
-6. Deploy: `firebase deploy`
-
 ## 🛠️ Troubleshooting
 
-**"Firebase configuration needed" error:**
-- Make sure you replaced the entire `firebaseConfig` object
-- Check that your API key doesn't contain "demo-api-key"
+**Build errors:**
+- Make sure all environment variables are set in Vercel
+- Check that variable names match exactly (case-sensitive)
 
-**"Permission denied" errors:**
-- Ensure Firestore security rules are set up correctly
-- Make sure users are signed in before accessing data
+**"Firebase configuration needed" error:**
+- Verify all 6 environment variables are set
+- Redeploy the application after adding variables
 
 **Authentication not working:**
-- Verify Email/Password is enabled in Firebase Auth
+- Ensure Email/Password is enabled in Firebase Auth
 - Check browser console for detailed error messages
+
+**Permission denied errors:**
+- Ensure Firestore security rules are set up correctly
+- Make sure users are signed in before accessing data
 
 ## 📞 Support
 
 If you need help:
-1. Check the browser console for error messages
-2. Verify all steps above are completed
+1. Check Vercel build logs for any error messages
+2. Verify all environment variables are correctly set
 3. Make sure your Firebase project billing is enabled (free tier works fine)
-4. Try creating a new Firebase project if issues persist
+4. Create an issue on GitHub with details
 
 **Happy studying! 📚**
