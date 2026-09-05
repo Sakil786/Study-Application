@@ -41,6 +41,227 @@
     );
   }
 
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 28px 24px 64px;
+  }
+
+  .auth-container {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 32px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 10px 28px rgba(34,49,79,0.1);
+    margin: 90px auto;
+  }
+
+  h1 {
+    font-family: 'Lora', serif;
+    font-size: 28px;
+    margin: 0 0 8px;
+    text-align: center;
+  }
+
+  .subtitle {
+    color: var(--ink-soft);
+    font-size: 14px;
+    text-align: center;
+    margin: 0 0 24px;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+
+  input[type="text"], input[type="email"], input[type="password"] {
+    width: 100%;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--card-border);
+    border-radius: 7px;
+    padding: 12px;
+    transition: border-color 0.2s;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: var(--forest);
+  }
+
+  .btn {
+    width: 100%;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    background: var(--forest);
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    padding: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 8px;
+  }
+
+  .btn:hover {
+    background: var(--forest-dark);
+  }
+
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .switch-mode {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--card-border);
+  }
+
+  .switch-mode p {
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 0 0 8px;
+  }
+
+  .switch-btn {
+    background: none;
+    border: none;
+    color: var(--forest);
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: underline;
+  }
+
+  .error {
+    background: #fdf1f1;
+    color: var(--danger);
+    border: 1px solid #f5c6cb;
+    border-radius: 7px;
+    padding: 12px;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .success {
+    background: #f1f9f4;
+    color: var(--forest-dark);
+    border: 1px solid #c3e6cb;
+    border-radius: 7px;
+    padding: 12px;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .coming-soon {
+    text-align: center;
+    padding: 20px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="auth-container">
+    <h1 id="authTitle">Study Log Application</h1>
+    <p class="subtitle" id="authSubtitle">Track your daily study sessions with subjects, progress, and analytics</p>
+    
+    <div class="coming-soon">
+      <h2 style="margin: 0 0 10px; font-size: 20px; color: var(--forest);">🚀 Coming Soon!</h2>
+      <p style="margin: 0 0 15px; color: var(--ink-soft);">
+        We're currently setting up the full authentication system and database backend.
+        The application will include:
+      </p>
+      <ul style="text-align: left; color: var(--ink-soft); margin: 0 0 20px; padding-left: 20px;">
+        <li>✅ User signup and secure login</li>
+        <li>✅ Personal study log with subjects and entries</li>
+        <li>✅ Daily progress tracking and streaks</li>
+        <li>✅ Study time analytics and charts</li>
+        <li>✅ Understanding level tracking (1-5 dots)</li>
+        <li>✅ Timeline view of all study sessions</li>
+      </ul>
+      <p style="margin: 0; font-size: 13px; color: var(--ink-faint);">
+        Backend deployment is in progress. Please check back soon!
+      </p>
+    </div>
+    
+    <div class="switch-mode">
+      <p>Want to see the demo version?</p>
+      <a href="https://github.com/Sakil786/Study-Application" target="_blank" style="color: var(--forest); font-weight: 600; text-decoration: none;">
+        📱 View on GitHub →
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+console.log('Study Log Application - Coming Soon!');
+console.log('Features will include: User auth, study tracking, progress analytics, and more!');
+
+// Check if we're in development mode
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+  document.querySelector('.coming-soon').innerHTML = `
+    <h2 style="margin: 0 0 10px; font-size: 20px; color: var(--ochre);">🔧 Development Mode</h2>
+    <p style="margin: 0; color: var(--ink-soft);">
+      Running in local development. The full application with authentication will be available once deployed to production with a proper database backend.
+    </p>
+  `;
+}
+</script>
+
+</body>
+</html>
+  :root {
+    --paper: #EFEAE0;
+    --paper-line: rgba(34,49,79,0.07);
+    --card: #FBF9F4;
+    --card-border: #DED6C4;
+    --ink: #22314F;
+    --ink-soft: #5A6786;
+    --ink-faint: #8B93A8;
+    --forest: #3F6C51;
+    --forest-dark: #2F5540;
+    --ochre: #C98A2B;
+    --danger: #A24C63;
+    --radius-card: 10px;
+    --radius-pill: 999px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 31px,
+      var(--paper-line) 32px
+    );
+  }
+
   a { color: inherit; }
 
   .wrap {
