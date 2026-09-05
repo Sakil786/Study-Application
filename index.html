@@ -2536,28 +2536,14 @@
 </div>
 <script>
 // Firebase configuration - Replace these values with your Firebase project config
-// Get these from: Firebase Console → Project Settings → General → Your apps
 const firebaseConfig = {
-  apiKey: "demo-api-key-replace-with-your-own",
-  authDomain: "demo-project.firebaseapp.com",
-  projectId: "demo-project", 
-  storageBucket: "demo-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:demo-app-id"
-};
-
-// Override with actual config if you have one
-// Uncomment and replace with your real Firebase config:
-/*
-const firebaseConfig = {
-  apiKey: "your-actual-api-key",
+  apiKey: "AIzaSyCDemo-Replace-With-Your-Actual-Key",
   authDomain: "your-project.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project.appspot.com", 
-  messagingSenderId: "your-sender-id",
-  appId: "your-app-id"
+  projectId: "your-project-id", 
+  storageBucket: "your-project.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:your-app-id"
 };
-*/
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
@@ -2657,8 +2643,9 @@ function showMainApp() {
 
 // Check if Firebase is properly configured
 function isFirebaseConfigured() {
-  return firebaseConfig.apiKey !== "demo-api-key-replace-with-your-own" && 
-         firebaseConfig.projectId !== "demo-project";
+  return firebaseConfig.apiKey !== "AIzaSyCDemo-Replace-With-Your-Actual-Key" && 
+         !firebaseConfig.apiKey.includes("demo") &&
+         firebaseConfig.projectId !== "your-project-id";
 }
 
 // Show configuration instructions if Firebase isn't set up
