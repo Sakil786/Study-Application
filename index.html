@@ -2547,12 +2547,12 @@
 <script>
 // Firebase configuration - uses environment variables or defaults to demo values
 const firebaseConfig = {
-  apiKey: "AIzaSyCDemo-Replace-With-Your-Actual-Key",
-  authDomain: "your-project.firebaseapp.com",
-  projectId: "your-project-id", 
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:your-app-id"
+  apiKey: "AIzaSyDEZp8odDmx9mKG4Hn1SvyeQou5a8lSszM",
+  authDomain: "study-log-app-d37cb.firebaseapp.com",
+  projectId: "study-log-app-d37cb",
+  storageBucket: "study-log-app-d37cb.firebasestorage.app",
+  messagingSenderId: "682076070610",
+  appId: "1:682076070610:web:f3f1554589f3a823ec430b"
 };
 
 // Initialize Firebase
@@ -2656,7 +2656,8 @@ function isFirebaseConfigured() {
   return firebaseConfig.apiKey !== "AIzaSyCDemo-Replace-With-Your-Actual-Key" && 
          !firebaseConfig.apiKey.includes("Demo") &&
          firebaseConfig.projectId !== "your-project-id" &&
-         firebaseConfig.authDomain !== "your-project.firebaseapp.com";
+         firebaseConfig.authDomain !== "your-project.firebaseapp.com" &&
+         firebaseConfig.apiKey === "AIzaSyDEZp8odDmx9mKG4Hn1SvyeQou5a8lSszM";
 }
 
 // Show configuration instructions if Firebase isn't set up
