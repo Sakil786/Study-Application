@@ -775,6 +775,14 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- Loading Screen -->
+<div class="loading-screen" id="loadingScreen" style="display: flex;">
+  <div class="loading-content">
+    <div class="spinner"></div>
+    <p>Initializing Study Log...</p>
+  </div>
+</div>
+
 <div class="auth-screen" id="authScreen" style="display:none;">
   <div class="panel" style="max-width: 400px; margin: 90px auto; padding: 24px;">
     <h1 id="authTitle">Welcome to The Study Log</h1>
@@ -1852,6 +1860,7 @@
     display: none;
     align-items: center;
     justify-content: center;
+    padding: 20px;
   }
 
   .auth-screen.show {
@@ -2625,16 +2634,18 @@ function clearBanner() {
 // Screen management
 function showLoadingScreen() {
   el('loadingScreen').style.display = 'flex';
-  el('authScreen').classList.remove('show');
+  el('authScreen').style.display = 'none';
   el('mainWrap').style.display = 'none';
 }
 
 function showAuthScreen() {
+  el('loadingScreen').style.display = 'none';
   el('authScreen').style.display = 'flex';
   el('mainWrap').style.display = 'none';
 }
 
 function showMainApp() {
+  el('loadingScreen').style.display = 'none';
   el('authScreen').style.display = 'none';
   el('mainWrap').style.display = 'block';
   renderAll();
