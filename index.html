@@ -7,6 +7,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <style>
   :root {
     --paper: #EFEAE0;
@@ -41,10 +45,26 @@
     );
   }
 
+  a { color: inherit; }
+
   .wrap {
     max-width: 1180px;
     margin: 0 auto;
     padding: 28px 24px 64px;
+  }
+
+  /* Auth Screen Styles */
+  .auth-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--paper);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .auth-container {
@@ -55,17 +75,16 @@
     width: 100%;
     max-width: 400px;
     box-shadow: 0 10px 28px rgba(34,49,79,0.1);
-    margin: 90px auto;
   }
 
-  h1 {
+  .auth-container h1 {
     font-family: 'Lora', serif;
     font-size: 28px;
     margin: 0 0 8px;
     text-align: center;
   }
 
-  .subtitle {
+  .auth-container .subtitle {
     color: var(--ink-soft);
     font-size: 14px;
     text-align: center;
@@ -84,7 +103,7 @@
     margin-bottom: 5px;
   }
 
-  input[type="text"], input[type="email"], input[type="password"] {
+  input[type="text"], input[type="email"], input[type="password"], input[type="date"], input[type="number"], textarea, select {
     width: 100%;
     font-family: inherit;
     font-size: 14px;
@@ -96,24 +115,27 @@
     transition: border-color 0.2s;
   }
 
-  input:focus {
+  textarea {
+    resize: vertical;
+    min-height: 72px;
+  }
+
+  input:focus, textarea:focus, select:focus {
     outline: none;
     border-color: var(--forest);
   }
 
   .btn {
-    width: 100%;
     font-family: inherit;
+    cursor: pointer;
+    border: none;
+    border-radius: 7px;
     font-size: 14px;
     font-weight: 600;
     background: var(--forest);
     color: #fff;
-    border: none;
-    border-radius: 7px;
-    padding: 12px;
-    cursor: pointer;
+    padding: 12px 16px;
     transition: background-color 0.2s;
-    margin-top: 8px;
   }
 
   .btn:hover {
@@ -123,6 +145,21 @@
   .btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+  }
+
+  .btn.full-width {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .btn.secondary {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--card-border);
+  }
+
+  .btn.secondary:hover {
+    background: rgba(34,49,79,0.05);
   }
 
   .switch-mode {
@@ -155,6 +192,11 @@
     padding: 12px;
     font-size: 13px;
     margin-bottom: 16px;
+    display: none;
+  }
+
+  .error.show {
+    display: block;
   }
 
   .success {
@@ -167,68 +209,95 @@
     margin-bottom: 16px;
   }
 
-  .coming-soon {
-    text-align: center;
-    padding: 20px;
+  /* Main App Header */
+  header.app-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+
+  header.app-header h1 {
+    font-family: 'Lora', serif;
+    font-weight: 700;
+    font-size: 30px;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  header.app-header p {
+    margin: 4px 0 0;
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+
+  .today-pill {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-pill);
+    padding: 7px 16px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+
+  .header-right { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    flex-wrap: wrap; 
+  }
+
+  .student-control { 
+    position: relative; 
+  }
+
+  .student-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-pill);
+    padding: 6px 14px 6px 6px;
+    font-size: 13px;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .student-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--forest);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .student-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
     background: var(--card);
     border: 1px solid var(--card-border);
     border-radius: 10px;
-    margin-top: 20px;
+    padding: 14px;
+    width: 240px;
+    box-shadow: 0 10px 28px rgba(34,49,79,0.14);
+    display: none;
+    z-index: 30;
   }
-</style>
-</head>
-<body>
-
-<div class="wrap">
-  <div class="auth-container">
-    <h1 id="authTitle">Study Log Application</h1>
-    <p class="subtitle" id="authSubtitle">Track your daily study sessions with subjects, progress, and analytics</p>
-    
-    <div class="coming-soon">
-      <h2 style="margin: 0 0 10px; font-size: 20px; color: var(--forest);">🚀 Coming Soon!</h2>
-      <p style="margin: 0 0 15px; color: var(--ink-soft);">
-        We're currently setting up the full authentication system and database backend.
-        The application will include:
-      </p>
-      <ul style="text-align: left; color: var(--ink-soft); margin: 0 0 20px; padding-left: 20px;">
-        <li>✅ User signup and secure login</li>
-        <li>✅ Personal study log with subjects and entries</li>
-        <li>✅ Daily progress tracking and streaks</li>
-        <li>✅ Study time analytics and charts</li>
-        <li>✅ Understanding level tracking (1-5 dots)</li>
-        <li>✅ Timeline view of all study sessions</li>
-      </ul>
-      <p style="margin: 0; font-size: 13px; color: var(--ink-faint);">
-        Backend deployment is in progress. Please check back soon!
-      </p>
-    </div>
-    
-    <div class="switch-mode">
-      <p>Want to see the demo version?</p>
-      <a href="https://github.com/Sakil786/Study-Application" target="_blank" style="color: var(--forest); font-weight: 600; text-decoration: none;">
-        📱 View on GitHub →
-      </a>
-    </div>
-  </div>
-</div>
-
-<script>
-console.log('Study Log Application - Coming Soon!');
-console.log('Features will include: User auth, study tracking, progress analytics, and more!');
-
-// Check if we're in development mode
-if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-  document.querySelector('.coming-soon').innerHTML = `
-    <h2 style="margin: 0 0 10px; font-size: 20px; color: var(--ochre);">🔧 Development Mode</h2>
-    <p style="margin: 0; color: var(--ink-soft);">
-      Running in local development. The full application with authentication will be available once deployed to production with a proper database backend.
-    </p>
-  `;
-}
-</script>
-
-</body>
-</html>
+  
+  .student-menu.open { 
+    display: block; 
+  }
   :root {
     --paper: #EFEAE0;
     --paper-line: rgba(34,49,79,0.07);
@@ -1702,5 +1771,1764 @@ if (window.location.hostname === 'localhost' || window.location.hostname === '12
   init();
 })();
 </script>
+</body>
+</html>
+<style>
+  :root {
+    --paper: #EFEAE0;
+    --paper-line: rgba(34,49,79,0.07);
+    --card: #FBF9F4;
+    --card-border: #DED6C4;
+    --ink: #22314F;
+    --ink-soft: #5A6786;
+    --ink-faint: #8B93A8;
+    --forest: #3F6C51;
+    --forest-dark: #2F5540;
+    --ochre: #C98A2B;
+    --danger: #A24C63;
+    --radius-card: 10px;
+    --radius-pill: 999px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 31px,
+      var(--paper-line) 32px
+    );
+  }
+
+  .loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+  }
+
+  .loading-content {
+    text-align: center;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--card-border);
+    border-top: 3px solid var(--forest);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Auth Screen */
+  .auth-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--paper);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .auth-screen.show {
+    display: flex;
+  }
+
+  .auth-container {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 32px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 10px 28px rgba(34,49,79,0.1);
+  }
+
+  .auth-container h1 {
+    font-family: 'Lora', serif;
+    font-size: 28px;
+    margin: 0 0 8px;
+    text-align: center;
+  }
+
+  .auth-container .subtitle {
+    color: var(--ink-soft);
+    font-size: 14px;
+    text-align: center;
+    margin: 0 0 24px;
+  }
+
+  /* Form Styles */
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+
+  input[type="text"], input[type="email"], input[type="password"], input[type="date"], input[type="number"], textarea, select {
+    width: 100%;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--card-border);
+    border-radius: 7px;
+    padding: 12px;
+    transition: border-color 0.2s;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 72px;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--forest);
+  }
+
+  .btn {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    border-radius: 7px;
+    font-size: 14px;
+    font-weight: 600;
+    background: var(--forest);
+    color: #fff;
+    padding: 12px 16px;
+    transition: background-color 0.2s;
+  }
+
+  .btn:hover {
+    background: var(--forest-dark);
+  }
+
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .btn.full-width {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .btn.secondary {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--card-border);
+  }
+
+  .btn.secondary:hover {
+    background: rgba(34,49,79,0.05);
+  }
+
+  .switch-mode {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--card-border);
+  }
+
+  .switch-mode p {
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 0 0 8px;
+  }
+
+  .switch-btn {
+    background: none;
+    border: none;
+    color: var(--forest);
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: underline;
+  }
+
+  .message {
+    border-radius: 7px;
+    padding: 12px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+  }
+
+  .message.error {
+    background: #fdf1f1;
+    color: var(--danger);
+    border: 1px solid #f5c6cb;
+  }
+
+  .message.success {
+    background: #f1f9f4;
+    color: var(--forest-dark);
+    border: 1px solid #c3e6cb;
+  }
+
+  .message.show {
+    display: block;
+  }
+
+  /* Main App */
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 28px 24px 64px;
+  }
+
+  header.app-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+
+  header.app-header h1 {
+    font-family: 'Lora', serif;
+    font-weight: 700;
+    font-size: 30px;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  header.app-header p {
+    margin: 4px 0 0;
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+
+  .today-pill {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-pill);
+    padding: 7px 16px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+
+  .header-right { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    flex-wrap: wrap; 
+  }
+
+  .student-control { 
+    position: relative; 
+  }
+
+  .student-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-pill);
+    padding: 6px 14px 6px 6px;
+    font-size: 13px;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .student-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--forest);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .student-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 14px;
+    width: 240px;
+    box-shadow: 0 10px 28px rgba(34,49,79,0.14);
+    display: none;
+    z-index: 30;
+  }
+  
+  .student-menu.open { 
+    display: block; 
+  }
+
+  /* Layout */
+  .layout {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr) 250px;
+    gap: 20px;
+    align-items: start;
+  }
+
+  @media (max-width: 980px) {
+    .layout { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-card);
+    padding: 18px;
+  }
+
+  .panel + .panel { margin-top: 18px; }
+
+  .panel h2 {
+    font-family: 'Lora', serif;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 12px;
+  }
+
+  /* Subjects */
+  .subject-list {
+    list-style: none;
+    margin: 0 0 14px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  @media (max-width: 980px) {
+    .subject-list { flex-direction: row; flex-wrap: wrap; }
+  }
+
+  .subject-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 8px 10px;
+    cursor: pointer;
+    font-size: 13.5px;
+    background: transparent;
+  }
+
+  .subject-item:hover { background: rgba(34,49,79,0.05); }
+  .subject-item.active {
+    background: rgba(34,49,79,0.06);
+    border-color: var(--card-border);
+  }
+
+  .subject-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .subject-name { flex: 1; font-weight: 500; }
+  .subject-count { color: var(--ink-faint); font-size: 12px; }
+
+  .subject-remove {
+    border: none;
+    background: none;
+    color: var(--ink-faint);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0 2px;
+    line-height: 1;
+    visibility: hidden;
+  }
+  .subject-item:hover .subject-remove { visibility: visible; }
+  .subject-remove:hover { color: var(--danger); }
+
+  .empty-note {
+    color: var(--ink-faint);
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 4px 2px 12px;
+  }
+
+  /* Swatches */
+  .swatches { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .swatch {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+  }
+  .swatch.selected { border-color: var(--ink); }
+
+  /* Understanding picker */
+  .understanding-picker { display: flex; gap: 8px; align-items: center; }
+  .u-dot {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1.5px solid var(--card-border);
+    background: #fff;
+    cursor: pointer;
+  }
+  .u-dot.filled { background: var(--ochre); border-color: var(--ochre); }
+  .u-hint { font-size: 12px; color: var(--ink-faint); margin-left: 4px; }
+
+  /* Timeline */
+  .timeline-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .timeline-controls input, .timeline-controls select { 
+    width: auto; 
+    flex: 1; 
+    min-width: 140px; 
+  }
+
+  .date-group { margin-bottom: 18px; }
+  .date-heading {
+    font-family: 'Lora', serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 0 0 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  .entry-card {
+    display: flex;
+    gap: 12px;
+    padding: 12px 4px;
+    border-bottom: 1px solid rgba(34,49,79,0.06);
+  }
+  .entry-card:last-child { border-bottom: none; }
+
+  .entry-bar {
+    width: 4px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .entry-body { flex: 1; min-width: 0; }
+  .entry-top-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: baseline;
+  }
+  .entry-topic { font-weight: 600; font-size: 14.5px; }
+  .entry-subject-tag { font-size: 12px; color: var(--ink-soft); }
+  .entry-notes {
+    color: var(--ink-soft);
+    font-size: 13.5px;
+    margin: 4px 0 6px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .entry-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+  .entry-meta .u-mini-dots { display: inline-flex; gap: 2px; }
+  .u-mini-dot { 
+    width: 6px; 
+    height: 6px; 
+    border-radius: 50%; 
+    background: var(--card-border); 
+  }
+  .u-mini-dot.on { background: var(--ochre); }
+
+  .entry-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .icon-btn {
+    border: none;
+    background: none;
+    color: var(--ink-faint);
+    font-size: 13px;
+    padding: 2px 4px;
+    cursor: pointer;
+  }
+  .icon-btn:hover { color: var(--ink); }
+  .icon-btn.danger:hover { color: var(--danger); }
+
+  /* Stats */
+  .stat-block { margin-bottom: 16px; }
+  .stat-number {
+    font-family: 'Lora', serif;
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 1;
+  }
+  .stat-label { font-size: 12.5px; color: var(--ink-soft); margin-top: 3px; }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .bar-row { margin-bottom: 10px; }
+  .bar-row-top {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12.5px;
+    margin-bottom: 4px;
+  }
+  .bar-track {
+    height: 6px;
+    background: rgba(34,49,79,0.08);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .bar-fill { height: 100%; border-radius: 3px; }
+
+  .status-banner {
+    background: #fdf1e7;
+    border: 1px solid #ecd3ae;
+    color: #7a4b13;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .field-row { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 12px; 
+  }
+
+  .btn-row { 
+    display: flex; 
+    gap: 10px; 
+    margin-top: 4px; 
+  }
+
+  ::selection { background: rgba(63,108,81,0.25); }
+
+  .toast {
+    position: fixed;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: var(--radius-pill);
+    font-size: 13px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 50;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+  }
+  .toast.show { 
+    opacity: 1; 
+    transform: translateX(-50%) translateY(0); 
+  }
+</style>
+</head>
+<body>
+<!-- Loading Screen -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-content">
+    <div class="spinner"></div>
+    <p>Initializing Study Log...</p>
+  </div>
+</div>
+
+<!-- Auth Screen -->
+<div class="auth-screen" id="authScreen">
+  <div class="auth-container">
+    <h1 id="authTitle">Welcome to Study Log</h1>
+    <p class="subtitle" id="authSubtitle">Create an account to start tracking your study sessions</p>
+    
+    <div class="message" id="authMessage"></div>
+    
+    <form id="authForm">
+      <div class="form-group">
+        <label for="authEmail">Email</label>
+        <input type="email" id="authEmail" name="email" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="authPassword">Password</label>
+        <input type="password" id="authPassword" name="password" required minlength="6">
+      </div>
+      
+      <button type="submit" class="btn full-width" id="authSubmitBtn">Sign Up</button>
+    </form>
+    
+    <div class="switch-mode">
+      <p id="authSwitchText">Already have an account?</p>
+      <button type="button" class="switch-btn" id="authSwitchBtn">Log In</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast"></div>
+
+<!-- Main Application -->
+<div class="wrap" id="mainWrap" style="display:none;">
+  <header class="app-header">
+    <div>
+      <h1>The Study Log</h1>
+      <p id="headerSubtitle">Track what you study each day, subject by subject.</p>
+    </div>
+    <div class="header-right">
+      <div class="today-pill" id="todayPill"></div>
+      <div class="student-control">
+        <button type="button" class="student-btn" id="studentMenuBtn">
+          <span class="student-avatar" id="studentAvatar">?</span>
+          <span id="studentNameLabel">Loading...</span>
+        </button>
+        <div class="student-menu" id="studentMenu">
+          <div style="padding: 0 0 12px; border-bottom: 1px solid var(--card-border); margin-bottom: 12px;">
+            <div style="font-size: 12.5px; color: var(--ink-soft); font-weight: 600;">Logged in as</div>
+            <div style="font-weight: 600; margin-top: 2px;" id="loggedInUser">User</div>
+          </div>
+          <button type="button" class="btn secondary" id="logoutBtn" style="width:100%;padding:7px 12px;font-size:13px;">Sign Out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div id="statusBanner"></div>
+
+  <div class="layout">
+    <!-- LEFT: subjects -->
+    <div>
+      <div class="panel">
+        <h2>Subjects</h2>
+        <ul class="subject-list" id="subjectList"></ul>
+        <form class="subject-form" id="subjectForm">
+          <div class="form-group">
+            <label for="subjectNameInput">New subject</label>
+            <input type="text" id="subjectNameInput" placeholder="e.g. Physics" maxlength="40" />
+            <div class="message error" id="subjectNameError"></div>
+          </div>
+          <div class="form-group">
+            <label>Tab color</label>
+            <div class="swatches" id="swatchPicker"></div>
+          </div>
+          <button type="submit" class="btn">Add subject</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- CENTER: entry form + timeline -->
+    <div>
+      <div class="panel">
+        <h2 id="formTitle">Today's entry</h2>
+        <form id="entryForm">
+          <div class="field-row">
+            <div class="form-group">
+              <label for="entrySubjectSelect">Subject</label>
+              <select id="entrySubjectSelect"></select>
+            </div>
+            <div class="form-group">
+              <label for="entryDateInput">Date</label>
+              <input type="date" id="entryDateInput" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="entryTopicInput">Topic or chapter</label>
+            <input type="text" id="entryTopicInput" placeholder="What chapter or topic did you cover?" maxlength="80" />
+          </div>
+          <div class="form-group">
+            <label for="entryNotesInput">Notes</label>
+            <textarea id="entryNotesInput" placeholder="What did you study, in your own words? Key ideas, formulas, questions you still have..."></textarea>
+          </div>
+          <div class="field-row">
+            <div class="form-group">
+              <label for="entryMinutesInput">Minutes studied</label>
+              <input type="number" id="entryMinutesInput" min="1" max="600" placeholder="45" />
+            </div>
+            <div class="form-group">
+              <label>How well do you get it?</label>
+              <div class="understanding-picker" id="understandingPicker"></div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn" id="submitEntryBtn">Save entry</button>
+            <button type="button" class="btn secondary" id="cancelEditBtn" style="display:none;">Cancel edit</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>Timeline</h2>
+        <div class="timeline-controls">
+          <input type="text" id="searchInput" placeholder="Search topics and notes" />
+          <select id="filterSubjectSelect"></select>
+        </div>
+        <div id="timelineContainer"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: stats -->
+    <div class="panel">
+      <h2>Progress</h2>
+      <div class="stat-grid">
+        <div class="stat-block">
+          <div class="stat-number" id="streakStat">0</div>
+          <div class="stat-label">day streak</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-number" id="weekStat">0h</div>
+          <div class="stat-label">this week</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-number" id="totalHoursStat">0h</div>
+          <div class="stat-label">total studied</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-number" id="entryCountStat">0</div>
+          <div class="stat-label">entries logged</div>
+        </div>
+      </div>
+      <h2 style="margin-top: 6px;">Hours by subject</h2>
+      <div id="subjectBars"></div>
+    </div>
+  </div>
+</div>
+<script>
+// Firebase configuration - You'll need to replace this with your own config
+const firebaseConfig = {
+  // Note: For demo purposes, these are placeholder values
+  // Users need to create their own Firebase project and replace these
+  apiKey: "demo-api-key-replace-with-your-own",
+  authDomain: "demo-project.firebaseapp.com",
+  projectId: "demo-project",
+  storageBucket: "demo-project.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:demo-app-id"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// Application state
+const state = {
+  user: null,
+  subjects: [],
+  entries: [],
+  activeSubjectFilter: 'all',
+  search: '',
+  selectedSwatch: '#B5533C',
+  editingEntryId: null,
+  understandingValue: 3,
+  isLoginMode: false
+};
+
+const PALETTE = ['#B5533C', '#2D6E8E', '#8A6BA1', '#C98A2B', '#5C7A4A', '#55627A', '#A24C63'];
+
+// DOM helpers
+const el = id => document.getElementById(id);
+
+// Utility functions
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+function todayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function formatDateHeading(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  const opts = { weekday: 'long', month: 'long', day: 'numeric' };
+  const heading = d.toLocaleDateString(undefined, opts);
+  if (dateStr === todayStr()) return heading + ' · today';
+  return heading;
+}
+
+function minutesToHoursLabel(mins) {
+  const hrs = mins / 60;
+  if (hrs === 0) return '0h';
+  if (hrs < 10) return hrs.toFixed(1).replace(/\.0$/, '') + 'h';
+  return Math.round(hrs) + 'h';
+}
+
+// UI helpers
+function showMessage(elementId, message, type = 'error') {
+  const messageEl = el(elementId);
+  messageEl.textContent = message;
+  messageEl.className = `message ${type} show`;
+}
+
+function clearMessage(elementId) {
+  const messageEl = el(elementId);
+  messageEl.className = 'message';
+}
+
+let toastTimer = null;
+function showToast(msg) {
+  const t = el('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function showBanner(msg) {
+  el('statusBanner').innerHTML = '<div class="status-banner">' + msg + '</div>';
+}
+
+function clearBanner() { 
+  el('statusBanner').innerHTML = ''; 
+}
+
+// Screen management
+function showLoadingScreen() {
+  el('loadingScreen').style.display = 'flex';
+  el('authScreen').classList.remove('show');
+  el('mainWrap').style.display = 'none';
+}
+
+function showAuthScreen() {
+  el('loadingScreen').style.display = 'none';
+  el('authScreen').classList.add('show');
+  el('mainWrap').style.display = 'none';
+}
+
+function showMainApp() {
+  el('loadingScreen').style.display = 'none';
+  el('authScreen').classList.remove('show');
+  el('mainWrap').style.display = 'block';
+  renderAll();
+}
+
+// Check if Firebase is properly configured
+function isFirebaseConfigured() {
+  return firebaseConfig.apiKey !== "demo-api-key-replace-with-your-own";
+}
+
+// Show configuration instructions if Firebase isn't set up
+function showFirebaseSetupInstructions() {
+  el('authScreen').innerHTML = `
+    <div class="auth-container">
+      <h1>🔧 Firebase Setup Required</h1>
+      <div class="message error show">
+        <strong>Firebase Configuration Needed</strong><br><br>
+        To use this application, you need to:
+        <ol style="margin: 10px 0 0 20px; padding: 0;">
+          <li>Create a Firebase project at <a href="https://console.firebase.google.com" target="_blank" style="color: var(--forest);">console.firebase.google.com</a></li>
+          <li>Enable Authentication (Email/Password)</li>
+          <li>Create a Firestore database</li>
+          <li>Replace the firebaseConfig in the HTML with your project's config</li>
+        </ol>
+      </div>
+      <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; font-size: 13px;">
+        <strong>Demo Mode Available:</strong> For now, you can use the localStorage version by refreshing the page and using Option 1 instead.
+      </div>
+    </div>
+  `;
+  showAuthScreen();
+}
+
+// Authentication functions
+async function signup(email, password) {
+  try {
+    clearMessage('authMessage');
+    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+    state.user = userCredential.user;
+    showToast('Account created successfully!');
+    await initializeUserData();
+    showMainApp();
+  } catch (error) {
+    console.error('Signup error:', error);
+    showMessage('authMessage', getAuthErrorMessage(error.code));
+  }
+}
+
+async function login(email, password) {
+  try {
+    clearMessage('authMessage');
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    state.user = userCredential.user;
+    showToast('Welcome back!');
+    await loadUserData();
+    showMainApp();
+  } catch (error) {
+    console.error('Login error:', error);
+    showMessage('authMessage', getAuthErrorMessage(error.code));
+  }
+}
+
+async function logout() {
+  try {
+    await auth.signOut();
+    state.user = null;
+    state.subjects = [];
+    state.entries = [];
+    showAuthScreen();
+    showToast('Signed out successfully');
+  } catch (error) {
+    console.error('Logout error:', error);
+  }
+}
+
+function getAuthErrorMessage(errorCode) {
+  switch (errorCode) {
+    case 'auth/user-not-found':
+    case 'auth/wrong-password':
+      return 'Invalid email or password';
+    case 'auth/email-already-in-use':
+      return 'An account with this email already exists';
+    case 'auth/weak-password':
+      return 'Password should be at least 6 characters';
+    case 'auth/invalid-email':
+      return 'Please enter a valid email address';
+    case 'auth/too-many-requests':
+      return 'Too many failed attempts. Please try again later';
+    default:
+      return 'Authentication failed. Please try again';
+  }
+}
+
+// Firestore data functions
+async function initializeUserData() {
+  // Set up initial user document if it doesn't exist
+  const userDoc = db.collection('users').doc(state.user.uid);
+  const doc = await userDoc.get();
+  
+  if (!doc.exists) {
+    await userDoc.set({
+      email: state.user.email,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      lastActive: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } else {
+    await userDoc.update({
+      lastActive: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+  
+  await loadUserData();
+}
+
+async function loadUserData() {
+  if (!state.user) return;
+  
+  try {
+    // Load subjects
+    const subjectsSnapshot = await db.collection('subjects')
+      .where('userId', '==', state.user.uid)
+      .orderBy('createdAt')
+      .get();
+    
+    state.subjects = subjectsSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    // Load entries
+    const entriesSnapshot = await db.collection('entries')
+      .where('userId', '==', state.user.uid)
+      .orderBy('date', 'desc')
+      .get();
+    
+    state.entries = entriesSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    
+  } catch (error) {
+    console.error('Error loading user data:', error);
+    showBanner('Failed to load your data. Please refresh the page.');
+  }
+}
+
+// Subject management
+async function addSubject(name, color) {
+  if (!state.user) return;
+  
+  try {
+    const subjectData = {
+      name: name,
+      color: color,
+      userId: state.user.uid,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    
+    const docRef = await db.collection('subjects').add(subjectData);
+    
+    state.subjects.push({
+      id: docRef.id,
+      ...subjectData,
+      createdAt: new Date() // For immediate UI update
+    });
+    
+    showToast('Subject added');
+    return docRef.id;
+  } catch (error) {
+    console.error('Error adding subject:', error);
+    throw new Error('Failed to add subject');
+  }
+}
+
+async function deleteSubject(subjectId) {
+  if (!state.user) return;
+  
+  try {
+    // Delete subject
+    await db.collection('subjects').doc(subjectId).delete();
+    
+    // Delete all entries for this subject
+    const entriesSnapshot = await db.collection('entries')
+      .where('userId', '==', state.user.uid)
+      .where('subjectId', '==', subjectId)
+      .get();
+    
+    const batch = db.batch();
+    entriesSnapshot.docs.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+    await batch.commit();
+    
+    // Update local state
+    state.subjects = state.subjects.filter(s => s.id !== subjectId);
+    state.entries = state.entries.filter(e => e.subjectId !== subjectId);
+    
+    showToast('Subject removed');
+  } catch (error) {
+    console.error('Error deleting subject:', error);
+    throw new Error('Failed to delete subject');
+  }
+}
+
+// Entry management
+async function addEntry(entryData) {
+  if (!state.user) return;
+  
+  try {
+    const data = {
+      ...entryData,
+      userId: state.user.uid,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    
+    const docRef = await db.collection('entries').add(data);
+    
+    state.entries.unshift({
+      id: docRef.id,
+      ...data,
+      createdAt: new Date() // For immediate UI update
+    });
+    
+    showToast('Entry saved');
+    return docRef.id;
+  } catch (error) {
+    console.error('Error adding entry:', error);
+    throw new Error('Failed to save entry');
+  }
+}
+
+async function updateEntry(entryId, entryData) {
+  if (!state.user) return;
+  
+  try {
+    await db.collection('entries').doc(entryId).update(entryData);
+    
+    const index = state.entries.findIndex(e => e.id === entryId);
+    if (index !== -1) {
+      state.entries[index] = { ...state.entries[index], ...entryData };
+    }
+    
+    showToast('Entry updated');
+  } catch (error) {
+    console.error('Error updating entry:', error);
+    throw new Error('Failed to update entry');
+  }
+}
+
+async function deleteEntry(entryId) {
+  if (!state.user) return;
+  
+  try {
+    await db.collection('entries').doc(entryId).delete();
+    
+    state.entries = state.entries.filter(e => e.id !== entryId);
+    
+    showToast('Entry deleted');
+  } catch (error) {
+    console.error('Error deleting entry:', error);
+    throw new Error('Failed to delete entry');
+  }
+}
+// UI Rendering Functions
+function renderTodayPill() {
+  const d = new Date();
+  el('todayPill').textContent = d.toLocaleDateString(undefined, { 
+    weekday: 'long', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+}
+
+function renderUserInfo() {
+  if (state.user) {
+    const email = state.user.email;
+    const displayName = email.split('@')[0]; // Use part before @ as display name
+    
+    el('studentNameLabel').textContent = displayName;
+    el('studentAvatar').textContent = displayName.charAt(0).toUpperCase();
+    el('loggedInUser').textContent = email;
+    el('headerSubtitle').textContent = `${displayName}'s study timeline, subject by subject.`;
+  }
+}
+
+function renderSwatchPicker() {
+  const wrap = el('swatchPicker');
+  wrap.innerHTML = '';
+  PALETTE.forEach((color) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'swatch' + (state.selectedSwatch === color ? ' selected' : '');
+    btn.style.background = color;
+    btn.addEventListener('click', () => {
+      state.selectedSwatch = color;
+      renderSwatchPicker();
+    });
+    wrap.appendChild(btn);
+  });
+}
+
+function renderUnderstandingPicker() {
+  const wrap = el('understandingPicker');
+  wrap.innerHTML = '';
+  for (let i = 1; i <= 5; i++) {
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'u-dot' + (i <= state.understandingValue ? ' filled' : '');
+    dot.addEventListener('click', () => {
+      state.understandingValue = i;
+      renderUnderstandingPicker();
+    });
+    wrap.appendChild(dot);
+  }
+  const hint = document.createElement('span');
+  hint.className = 'u-hint';
+  hint.textContent = state.understandingValue + '/5';
+  wrap.appendChild(hint);
+}
+
+function renderSubjectList() {
+  const list = el('subjectList');
+  list.innerHTML = '';
+
+  if (state.subjects.length === 0) {
+    const note = document.createElement('div');
+    note.className = 'empty-note';
+    note.textContent = 'No subjects yet. Add one below to start logging.';
+    list.appendChild(note);
+    return;
+  }
+
+  const counts = {};
+  const minutesBySubject = calcMinutesBySubject();
+  state.entries.forEach((e) => { 
+    counts[e.subjectId] = (counts[e.subjectId] || 0) + 1; 
+  });
+
+  state.subjects.forEach((s) => {
+    const li = document.createElement('li');
+    li.className = 'subject-item' + (state.activeSubjectFilter === s.id ? ' active' : '');
+
+    const dot = document.createElement('span');
+    dot.className = 'subject-dot';
+    dot.style.background = s.color;
+
+    const name = document.createElement('span');
+    name.className = 'subject-name';
+    name.textContent = s.name;
+
+    const count = document.createElement('span');
+    count.className = 'subject-count';
+    count.textContent = minutesToHoursLabel(minutesBySubject[s.id] || 0);
+
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'subject-remove';
+    removeBtn.type = 'button';
+    removeBtn.textContent = '✕';
+    removeBtn.title = 'Remove subject';
+    removeBtn.addEventListener('click', async (ev) => {
+      ev.stopPropagation();
+      const entryCount = counts[s.id] || 0;
+      const msg = entryCount > 0
+        ? `Remove "${s.name}" and its ${entryCount} logged entries? This cannot be undone.`
+        : `Remove "${s.name}"?`;
+      if (!confirm(msg)) return;
+      
+      try {
+        await deleteSubject(s.id);
+        if (state.activeSubjectFilter === s.id) {
+          state.activeSubjectFilter = 'all';
+        }
+        renderAll();
+      } catch (error) {
+        showBanner('Failed to remove subject. Please try again.');
+      }
+    });
+
+    li.appendChild(dot);
+    li.appendChild(name);
+    li.appendChild(count);
+    li.appendChild(removeBtn);
+
+    li.addEventListener('click', () => {
+      state.activeSubjectFilter = state.activeSubjectFilter === s.id ? 'all' : s.id;
+      syncFilterSelect();
+      renderSubjectList();
+      renderTimeline();
+    });
+
+    list.appendChild(li);
+  });
+}
+
+function renderSubjectSelects() {
+  const entrySelect = el('entrySubjectSelect');
+  const filterSelect = el('filterSubjectSelect');
+  const prevEntryVal = entrySelect.value;
+
+  entrySelect.innerHTML = '';
+  if (state.subjects.length === 0) {
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.textContent = 'Add a subject first';
+    entrySelect.appendChild(opt);
+    entrySelect.disabled = true;
+  } else {
+    entrySelect.disabled = false;
+    state.subjects.forEach((s) => {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = s.name;
+      entrySelect.appendChild(opt);
+    });
+    if (state.subjects.some((s) => s.id === prevEntryVal)) {
+      entrySelect.value = prevEntryVal;
+    }
+  }
+
+  filterSelect.innerHTML = '';
+  const allOpt = document.createElement('option');
+  allOpt.value = 'all';
+  allOpt.textContent = 'All subjects';
+  filterSelect.appendChild(allOpt);
+  state.subjects.forEach((s) => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = s.name;
+    filterSelect.appendChild(opt);
+  });
+  filterSelect.value = state.activeSubjectFilter;
+}
+
+function syncFilterSelect() {
+  el('filterSubjectSelect').value = state.activeSubjectFilter;
+}
+
+function renderTimeline() {
+  const container = el('timelineContainer');
+  container.innerHTML = '';
+
+  if (state.subjects.length === 0) {
+    container.innerHTML = '<div class="empty-note">Add a subject, then log today\'s study session to begin your timeline.</div>';
+    return;
+  }
+
+  let entries = state.entries.slice();
+  if (state.activeSubjectFilter !== 'all') {
+    entries = entries.filter((e) => e.subjectId === state.activeSubjectFilter);
+  }
+  if (state.search.trim()) {
+    const q = state.search.trim().toLowerCase();
+    entries = entries.filter((e) =>
+      (e.topic || '').toLowerCase().includes(q) ||
+      (e.notes || '').toLowerCase().includes(q)
+    );
+  }
+
+  if (entries.length === 0) {
+    container.innerHTML = '<div class="empty-note">No entries found. Try adjusting your search or filter.</div>';
+    return;
+  }
+
+  entries.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  const dateGroups = {};
+  entries.forEach((e) => {
+    if (!dateGroups[e.date]) dateGroups[e.date] = [];
+    dateGroups[e.date].push(e);
+  });
+
+  Object.entries(dateGroups).forEach(([date, entries]) => {
+    const group = document.createElement('div');
+    group.className = 'date-group';
+
+    const heading = document.createElement('div');
+    heading.className = 'date-heading';
+    heading.textContent = formatDateHeading(date);
+    group.appendChild(heading);
+
+    entries.forEach((entry) => {
+      const subject = subjectById(entry.subjectId);
+      if (!subject) return;
+
+      const card = document.createElement('div');
+      card.className = 'entry-card';
+
+      const bar = document.createElement('div');
+      bar.className = 'entry-bar';
+      bar.style.background = subject.color;
+
+      const body = document.createElement('div');
+      body.className = 'entry-body';
+
+      const topRow = document.createElement('div');
+      topRow.className = 'entry-top-row';
+
+      const topic = document.createElement('div');
+      topic.className = 'entry-topic';
+      topic.textContent = entry.topic || 'Study session';
+
+      const subjectTag = document.createElement('div');
+      subjectTag.className = 'entry-subject-tag';
+      subjectTag.textContent = subject.name;
+
+      topRow.appendChild(topic);
+      topRow.appendChild(subjectTag);
+
+      const notes = document.createElement('div');
+      notes.className = 'entry-notes';
+      notes.textContent = entry.notes || '';
+
+      const meta = document.createElement('div');
+      meta.className = 'entry-meta';
+
+      const miniDots = document.createElement('div');
+      miniDots.className = 'u-mini-dots';
+      for (let i = 1; i <= 5; i++) {
+        const dot = document.createElement('span');
+        dot.className = 'u-mini-dot' + (i <= entry.understanding ? ' on' : '');
+        miniDots.appendChild(dot);
+      }
+
+      const duration = document.createElement('span');
+      duration.textContent = minutesToHoursLabel(entry.minutes || 0);
+
+      meta.appendChild(miniDots);
+      meta.appendChild(duration);
+
+      const actions = document.createElement('div');
+      actions.className = 'entry-actions';
+
+      const editBtn = document.createElement('button');
+      editBtn.className = 'icon-btn';
+      editBtn.textContent = '✏️';
+      editBtn.title = 'Edit entry';
+      editBtn.addEventListener('click', () => editEntry(entry));
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'icon-btn danger';
+      deleteBtn.textContent = '🗑️';
+      deleteBtn.title = 'Delete entry';
+      deleteBtn.addEventListener('click', async () => {
+        if (!confirm('Delete this entry?')) return;
+        try {
+          await deleteEntry(entry.id);
+          renderAll();
+        } catch (error) {
+          showBanner('Failed to delete entry. Please try again.');
+        }
+      });
+
+      actions.appendChild(editBtn);
+      actions.appendChild(deleteBtn);
+
+      body.appendChild(topRow);
+      if (notes.textContent) body.appendChild(notes);
+      body.appendChild(meta);
+
+      card.appendChild(bar);
+      card.appendChild(body);
+      card.appendChild(actions);
+
+      group.appendChild(card);
+    });
+
+    container.appendChild(group);
+  });
+}
+
+// Statistics functions
+function subjectById(id) {
+  return state.subjects.find((s) => s.id === id);
+}
+
+function calcStreak() {
+  const days = new Set(state.entries.map((e) => e.date));
+  let streak = 0;
+  const cur = new Date();
+  let dateStr = cur.toISOString().slice(0, 10);
+  if (!days.has(dateStr)) {
+    cur.setDate(cur.getDate() - 1);
+    dateStr = cur.toISOString().slice(0, 10);
+  }
+  while (days.has(dateStr)) {
+    streak++;
+    cur.setDate(cur.getDate() - 1);
+    dateStr = cur.toISOString().slice(0, 10);
+  }
+  return streak;
+}
+
+function calcWeekMinutes() {
+  const now = new Date();
+  const cutoff = new Date(now);
+  cutoff.setDate(cutoff.getDate() - 6);
+  cutoff.setHours(0, 0, 0, 0);
+  return state.entries
+    .filter((e) => new Date(e.date + 'T00:00:00') >= cutoff)
+    .reduce((sum, e) => sum + Number(e.minutes || 0), 0);
+}
+
+function calcTotalMinutes() {
+  return state.entries.reduce((sum, e) => sum + Number(e.minutes || 0), 0);
+}
+
+function calcMinutesBySubject() {
+  const map = {};
+  state.entries.forEach((e) => {
+    map[e.subjectId] = (map[e.subjectId] || 0) + Number(e.minutes || 0);
+  });
+  return map;
+}
+
+function renderStats() {
+  el('streakStat').textContent = calcStreak();
+  el('weekStat').textContent = minutesToHoursLabel(calcWeekMinutes());
+  el('totalHoursStat').textContent = minutesToHoursLabel(calcTotalMinutes());
+  el('entryCountStat').textContent = state.entries.length;
+
+  const barsContainer = el('subjectBars');
+  barsContainer.innerHTML = '';
+
+  const minutesBySubject = calcMinutesBySubject();
+  const totalMinutes = calcTotalMinutes();
+
+  if (totalMinutes === 0) {
+    barsContainer.innerHTML = '<div class="empty-note">No study time logged yet.</div>';
+    return;
+  }
+
+  state.subjects
+    .map((s) => ({ ...s, minutes: minutesBySubject[s.id] || 0 }))
+    .filter((s) => s.minutes > 0)
+    .sort((a, b) => b.minutes - a.minutes)
+    .forEach((s) => {
+      const percentage = (s.minutes / totalMinutes) * 100;
+
+      const row = document.createElement('div');
+      row.className = 'bar-row';
+
+      const top = document.createElement('div');
+      top.className = 'bar-row-top';
+
+      const name = document.createElement('span');
+      name.textContent = s.name;
+      name.style.color = s.color;
+
+      const time = document.createElement('span');
+      time.textContent = minutesToHoursLabel(s.minutes);
+
+      top.appendChild(name);
+      top.appendChild(time);
+
+      const track = document.createElement('div');
+      track.className = 'bar-track';
+
+      const fill = document.createElement('div');
+      fill.className = 'bar-fill';
+      fill.style.background = s.color;
+      fill.style.width = percentage + '%';
+
+      track.appendChild(fill);
+      row.appendChild(top);
+      row.appendChild(track);
+      barsContainer.appendChild(row);
+    });
+}
+
+function renderAll() {
+  renderTodayPill();
+  renderUserInfo();
+  renderSwatchPicker();
+  renderUnderstandingPicker();
+  renderSubjectList();
+  renderSubjectSelects();
+  renderTimeline();
+  renderStats();
+}
+
+// Form helpers
+function resetForm() {
+  el('entryForm').reset();
+  el('entryDateInput').value = todayStr();
+  state.editingEntryId = null;
+  state.understandingValue = 3;
+  renderUnderstandingPicker();
+  el('formTitle').textContent = "Today's entry";
+  el('submitEntryBtn').textContent = 'Save entry';
+  el('cancelEditBtn').style.display = 'none';
+}
+
+function editEntry(entry) {
+  const subject = subjectById(entry.subjectId);
+  if (!subject) return;
+
+  el('entrySubjectSelect').value = entry.subjectId;
+  el('entryDateInput').value = entry.date;
+  el('entryTopicInput').value = entry.topic || '';
+  el('entryNotesInput').value = entry.notes || '';
+  el('entryMinutesInput').value = entry.minutes || '';
+  
+  state.understandingValue = entry.understanding || 3;
+  state.editingEntryId = entry.id;
+  
+  renderUnderstandingPicker();
+  el('formTitle').textContent = 'Edit entry';
+  el('submitEntryBtn').textContent = 'Update entry';
+  el('cancelEditBtn').style.display = 'inline-block';
+  
+  el('entryTopicInput').focus();
+}
+// Event Handlers
+function setupEventListeners() {
+  // Auth form
+  el('authForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = el('authEmail').value.trim();
+    const password = el('authPassword').value;
+    
+    if (state.isLoginMode) {
+      await login(email, password);
+    } else {
+      await signup(email, password);
+    }
+  });
+  
+  // Auth mode toggle
+  el('authSwitchBtn').addEventListener('click', () => {
+    state.isLoginMode = !state.isLoginMode;
+    
+    if (state.isLoginMode) {
+      el('authTitle').textContent = 'Welcome Back';
+      el('authSubtitle').textContent = 'Sign in to your study log';
+      el('authSubmitBtn').textContent = 'Log In';
+      el('authSwitchText').textContent = "Don't have an account?";
+      el('authSwitchBtn').textContent = 'Sign Up';
+    } else {
+      el('authTitle').textContent = 'Welcome to Study Log';
+      el('authSubtitle').textContent = 'Create an account to start tracking your study sessions';
+      el('authSubmitBtn').textContent = 'Sign Up';
+      el('authSwitchText').textContent = 'Already have an account?';
+      el('authSwitchBtn').textContent = 'Log In';
+    }
+    
+    clearMessage('authMessage');
+  });
+  
+  // Logout
+  el('logoutBtn').addEventListener('click', logout);
+  
+  // Student menu
+  el('studentMenuBtn').addEventListener('click', () => {
+    const menu = el('studentMenu');
+    menu.classList.toggle('open');
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!el('studentControl').contains(e.target)) {
+      el('studentMenu').classList.remove('open');
+    }
+  });
+
+  // Subject form
+  el('subjectForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = el('subjectNameInput').value.trim();
+    
+    if (!name) {
+      showMessage('subjectNameError', 'Subject name is required');
+      return;
+    }
+    
+    if (state.subjects.some(s => s.name.toLowerCase() === name.toLowerCase())) {
+      showMessage('subjectNameError', 'Subject already exists');
+      return;
+    }
+    
+    try {
+      await addSubject(name, state.selectedSwatch);
+      
+      // Move to next color
+      const currentIndex = PALETTE.indexOf(state.selectedSwatch);
+      state.selectedSwatch = PALETTE[(currentIndex + 1) % PALETTE.length];
+      
+      el('subjectForm').reset();
+      clearMessage('subjectNameError');
+      renderAll();
+      
+      // Set the new subject as selected in the entry form
+      const newSubject = state.subjects[state.subjects.length - 1];
+      el('entrySubjectSelect').value = newSubject.id;
+    } catch (error) {
+      showMessage('subjectNameError', 'Failed to add subject. Please try again.');
+    }
+  });
+
+  // Entry form
+  el('entryForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const subjectId = el('entrySubjectSelect').value;
+    const date = el('entryDateInput').value;
+    const topic = el('entryTopicInput').value.trim();
+    const notes = el('entryNotesInput').value.trim();
+    const minutes = parseInt(el('entryMinutesInput').value) || 0;
+    
+    if (!subjectId || !date) {
+      showBanner('Please select a subject and date.');
+      return;
+    }
+    
+    const entryData = {
+      subjectId: subjectId,
+      date: date,
+      topic: topic,
+      notes: notes,
+      minutes: minutes,
+      understanding: state.understandingValue
+    };
+    
+    try {
+      if (state.editingEntryId) {
+        await updateEntry(state.editingEntryId, entryData);
+      } else {
+        await addEntry(entryData);
+      }
+      
+      resetForm();
+      renderAll();
+      clearBanner();
+    } catch (error) {
+      showBanner('Failed to save entry. Please try again.');
+    }
+  });
+
+  el('cancelEditBtn').addEventListener('click', resetForm);
+
+  // Search and filter
+  el('searchInput').addEventListener('input', (e) => {
+    state.search = e.target.value;
+    renderTimeline();
+  });
+
+  el('filterSubjectSelect').addEventListener('change', (e) => {
+    state.activeSubjectFilter = e.target.value;
+    renderSubjectList();
+    renderTimeline();
+  });
+
+  // Set today's date by default
+  el('entryDateInput').value = todayStr();
+}
+
+// Initialize application
+function init() {
+  showLoadingScreen();
+  
+  // Check Firebase configuration
+  if (!isFirebaseConfigured()) {
+    showFirebaseSetupInstructions();
+    return;
+  }
+  
+  setupEventListeners();
+  
+  // Listen for auth state changes
+  auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      state.user = user;
+      try {
+        await initializeUserData();
+        showMainApp();
+      } catch (error) {
+        console.error('Error initializing user data:', error);
+        showBanner('Failed to load your data. Please refresh the page.');
+        showMainApp();
+      }
+    } else {
+      state.user = null;
+      state.subjects = [];
+      state.entries = [];
+      showAuthScreen();
+    }
+  });
+}
+
+// Start the application
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
 </body>
 </html>
