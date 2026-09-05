@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Study Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #EFEAE0;
+    --paper-line: rgba(34,49,79,0.07);
+    --card: #FBF9F4;
+    --card-border: #DED6C4;
+    --ink: #22314F;
+    --ink-soft: #5A6786;
+    --ink-faint: #8B93A8;
+    --forest: #3F6C51;
+    --forest-dark: #2F5540;
+    --ochre: #C98A2B;
+    --danger: #A24C63;
+    --radius-card: 10px;
+    --radius-pill: 999px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 31px,
+      var(--paper-line) 32px
+    );
+  }
+
+  a { color: inherit; }
+
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 28px 24px 64px;
+  }
+
+  header.app-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+
+  header.app-header h1 {
+    font-family: 'Lora', serif;
+    font-weight: 700;
+    font-size: 30px;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  header.app-header p {
+    margin: 4px 0 0;
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+
+  .today-pill {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-pill);
+    padding: 7px 16px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+
+  .header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+  .student-control { position: relative; }
+
+  .student-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-pill);
+    padding: 6px 14px 6px 6px;
+    font-size: 13px;
+    color: var(--ink);
+  }
+
+  .student-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--forest);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .student-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 14px;
+    width: 240px;
+    box-shadow: 0 10px 28px rgba(34,49,79,0.14);
+    display: none;
+    z-index: 30;
+  }
+  .student-menu.open { display: block; }
+
+  .student-menu hr { border: none; border-top: 1px solid var(--card-border); margin: 12px 0; }
+
+  .student-menu-list {
+    list-style: none;
+    margin: 8px 0 12px;
+    padding: 0;
+    max-height: 130px;
+    overflow-y: auto;
+  }
+  .student-menu-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .student-menu-list li:hover { background: rgba(34,49,79,0.06); }
+  .student-menu-list li.current { font-weight: 600; cursor: default; }
+  .student-menu-list li.current:hover { background: none; }
+  .student-menu-list .tag { font-size: 11.5px; color: var(--ink-faint); }
+
+  .welcome-screen {
+    max-width: 420px;
+    margin: 90px auto;
+    padding: 0 24px;
+  }
+  .welcome-screen h1 {
+    font-family: 'Lora', serif;
+    font-size: 24px;
+    margin: 0 0 6px;
+  }
+  .welcome-screen p.sub {
+    color: var(--ink-soft);
+    font-size: 14px;
+    margin: 0 0 18px;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr) 250px;
+    gap: 20px;
+    align-items: start;
+  }
+
+  @media (max-width: 980px) {
+    .layout { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-card);
+    padding: 18px;
+  }
+
+  .panel + .panel { margin-top: 18px; }
+
+  .panel h2 {
+    font-family: 'Lora', serif;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 12px;
+  }
+
+  /* ---------- Subject spine ---------- */
+
+  .subject-list {
+    list-style: none;
+    margin: 0 0 14px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  @media (max-width: 980px) {
+    .subject-list { flex-direction: row; flex-wrap: wrap; }
+  }
+
+  .subject-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 8px 10px;
+    cursor: pointer;
+    font-size: 13.5px;
+    background: transparent;
+  }
+
+  .subject-item:hover { background: rgba(34,49,79,0.05); }
+
+  .subject-item.active {
+    background: rgba(34,49,79,0.06);
+    border-color: var(--card-border);
+  }
+
+  .subject-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .subject-name { flex: 1; font-weight: 500; }
+  .subject-count { color: var(--ink-faint); font-size: 12px; }
+
+  .subject-remove {
+    border: none;
+    background: none;
+    color: var(--ink-faint);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0 2px;
+    line-height: 1;
+    visibility: hidden;
+  }
+  .subject-item:hover .subject-remove { visibility: visible; }
+  .subject-remove:hover { color: var(--danger); }
+
+  .empty-note {
+    color: var(--ink-faint);
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 4px 2px 12px;
+  }
+
+  form.subject-form { display: flex; flex-direction: column; gap: 10px; }
+
+  .swatches { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .swatch {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+  }
+  .swatch.selected { border-color: var(--ink); }
+
+  /* ---------- Inputs ---------- */
+
+  input[type="text"], input[type="date"], input[type="number"], textarea, select {
+    width: 100%;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--card-border);
+    border-radius: 7px;
+    padding: 9px 10px;
+  }
+
+  textarea { resize: vertical; min-height: 72px; }
+
+  label.field-label {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .field { margin-bottom: 12px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .field-error {
+    color: var(--danger);
+    font-size: 12px;
+    margin-top: 5px;
+    min-height: 0;
+    display: none;
+  }
+  .field-error.show { display: block; }
+  input.input-error { border-color: var(--danger); }
+
+  .toast {
+    position: fixed;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: var(--radius-pill);
+    font-size: 13px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 50;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 7px;
+    padding: 9px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    background: var(--forest);
+    color: #fff;
+  }
+  .btn:hover { background: var(--forest-dark); }
+  .btn.secondary {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--card-border);
+  }
+  .btn.secondary:hover { background: rgba(34,49,79,0.05); }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 4px; }
+
+  /* ---------- Understanding dots ---------- */
+
+  .understanding-picker { display: flex; gap: 8px; align-items: center; }
+  .u-dot {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1.5px solid var(--card-border);
+    background: #fff;
+    cursor: pointer;
+  }
+  .u-dot.filled { background: var(--ochre); border-color: var(--ochre); }
+  .u-hint { font-size: 12px; color: var(--ink-faint); margin-left: 4px; }
+
+  /* ---------- Timeline ---------- */
+
+  .timeline-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .timeline-controls input, .timeline-controls select { width: auto; flex: 1; min-width: 140px; }
+
+  .date-group { margin-bottom: 18px; }
+  .date-heading {
+    font-family: 'Lora', serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 0 0 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  .entry-card {
+    display: flex;
+    gap: 12px;
+    padding: 12px 4px;
+    border-bottom: 1px solid rgba(34,49,79,0.06);
+  }
+  .entry-card:last-child { border-bottom: none; }
+
+  .entry-bar {
+    width: 4px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .entry-body { flex: 1; min-width: 0; }
+  .entry-top-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: baseline;
+  }
+  .entry-topic { font-weight: 600; font-size: 14.5px; }
+  .entry-subject-tag { font-size: 12px; color: var(--ink-soft); }
+  .entry-notes {
+    color: var(--ink-soft);
+    font-size: 13.5px;
+    margin: 4px 0 6px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .entry-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+  .entry-meta .u-mini-dots { display: inline-flex; gap: 2px; }
+  .u-mini-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--card-border); }
+  .u-mini-dot.on { background: var(--ochre); }
+
+  .entry-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .icon-btn {
+    border: none;
+    background: none;
+    color: var(--ink-faint);
+    font-size: 13px;
+    padding: 2px 4px;
+  }
+  .icon-btn:hover { color: var(--ink); }
+  .icon-btn.danger:hover { color: var(--danger); }
+
+  /* ---------- Stats ---------- */
+
+  .stat-block { margin-bottom: 16px; }
+  .stat-number {
+    font-family: 'Lora', serif;
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 1;
+  }
+  .stat-label { font-size: 12.5px; color: var(--ink-soft); margin-top: 3px; }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .bar-row { margin-bottom: 10px; }
+  .bar-row-top {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12.5px;
+    margin-bottom: 4px;
+  }
+  .bar-track {
+    height: 6px;
+    background: rgba(34,49,79,0.08);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .bar-fill { height: 100%; border-radius: 3px; }
+
+  .status-banner {
+    background: #fdf1e7;
+    border: 1px solid #ecd3ae;
+    color: #7a4b13;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  ::selection { background: rgba(63,108,81,0.25); }
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div class="welcome-screen" id="welcomeScreen" style="display:none;">
+  <div class="panel">
+    <h1>Welcome to The Study Log</h1>
+    <p class="sub">Enter your name to start your own study timeline. If others share this device, everyone keeps their own subjects and entries, and you can switch profiles anytime from the top corner.</p>
+    <div class="field">
+      <label class="field-label" for="welcomeNameInput">Your name</label>
+      <input type="text" id="welcomeNameInput" placeholder="e.g. Aisha Rao" maxlength="40" />
+    </div>
+    <button type="button" class="btn" id="welcomeStartBtn">Start my log</button>
+  </div>
+</div>
+
+<div class="wrap" id="mainWrap" style="display:none;">
+  <header class="app-header">
+    <div>
+      <h1>The Study Log</h1>
+      <p id="headerSubtitle">Track what you study each day, subject by subject.</p>
+    </div>
+    <div class="header-right">
+      <div class="today-pill" id="todayPill"></div>
+      <div class="student-control">
+        <button type="button" class="student-btn" id="studentMenuBtn">
+          <span class="student-avatar" id="studentAvatar">?</span>
+          <span id="studentNameLabel">Set your name</span>
+        </button>
+        <div class="student-menu" id="studentMenu">
+          <label class="field-label" for="renameInput">Your name</label>
+          <input type="text" id="renameInput" maxlength="40" placeholder="e.g. Aisha Rao" />
+          <div class="btn-row" style="margin-top:8px;">
+            <button type="button" class="btn" id="saveNameBtn" style="padding:7px 12px;font-size:13px;">Save</button>
+          </div>
+          <hr />
+          <label class="field-label">Switch student</label>
+          <ul class="student-menu-list" id="studentSwitchList"></ul>
+          <button type="button" class="btn secondary" id="newStudentBtn" style="width:100%;padding:7px 12px;font-size:13px;">+ New student profile</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div id="statusBanner"></div>
+
+  <div class="layout">
+    <!-- LEFT: subjects -->
+    <div>
+      <div class="panel">
+        <h2>Subjects</h2>
+        <ul class="subject-list" id="subjectList"></ul>
+        <form class="subject-form" id="subjectForm">
+          <div class="field">
+            <label class="field-label" for="subjectNameInput">New subject</label>
+            <input type="text" id="subjectNameInput" placeholder="e.g. Physics" maxlength="40" />
+            <div class="field-error" id="subjectNameError"></div>
+          </div>
+          <div class="field">
+            <label class="field-label">Tab color</label>
+            <div class="swatches" id="swatchPicker"></div>
+          </div>
+          <button type="submit" class="btn">Add subject</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- CENTER: entry form + timeline -->
+    <div>
+      <div class="panel">
+        <h2 id="formTitle">Today's entry</h2>
+        <form id="entryForm">
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label" for="entrySubjectSelect">Subject</label>
+              <select id="entrySubjectSelect"></select>
+            </div>
+            <div class="field">
+              <label class="field-label" for="entryDateInput">Date</label>
+              <input type="date" id="entryDateInput" />
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="entryTopicInput">Topic or chapter</label>
+            <input type="text" id="entryTopicInput" placeholder="What chapter or topic did you cover?" maxlength="80" />
+          </div>
+          <div class="field">
+            <label class="field-label" for="entryNotesInput">Notes</label>
+            <textarea id="entryNotesInput" placeholder="What did you study, in your own words? Key ideas, formulas, questions you still have..."></textarea>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label" for="entryMinutesInput">Minutes studied</label>
+              <input type="number" id="entryMinutesInput" min="1" max="600" placeholder="45" />
+            </div>
+            <div class="field">
+              <label class="field-label">How well do you get it?</label>
+              <div class="understanding-picker" id="understandingPicker"></div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn" id="submitEntryBtn">Save entry</button>
+            <button type="button" class="btn secondary" id="cancelEditBtn" style="display:none;">Cancel edit</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>Timeline</h2>
+        <div class="timeline-controls">
+          <input type="text" id="searchInput" placeholder="Search topics and notes" />
+          <select id="filterSubjectSelect"></select>
+        </div>
+        <div id="timelineContainer"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: stats -->
+    <div class="panel">
+      <h2>Progress</h2>
+      <div class="stat-grid">
+        <div class="stat-block">
+          <div class="stat-number" id="streakStat">0</div>
+          <div class="stat-label">day streak</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-number" id="weekStat">0h</div>
+          <div class="stat-label">this week</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-number" id="totalHoursStat">0h</div>
+          <div class="stat-label">total studied</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-number" id="entryCountStat">0</div>
+          <div class="stat-label">entries logged</div>
+        </div>
+      </div>
+      <h2 style="margin-top: 6px;">Hours by subject</h2>
+      <div id="subjectBars"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const PALETTE = ['#B5533C', '#2D6E8E', '#8A6BA1', '#C98A2B', '#5C7A4A', '#55627A', '#A24C63'];
+  const REGISTRY_KEY = 'student-registry';
+  const ACTIVE_KEY = 'active-student';
+
+  const state = {
+    studentId: null,
+    studentName: '',
+    registry: [],
+    subjects: [],
+    entries: [],
+    activeSubjectFilter: 'all',
+    search: '',
+    selectedSwatch: PALETTE[0],
+    editingEntryId: null,
+    understandingValue: 3,
+    loaded: false
+  };
+
+  const el = (id) => document.getElementById(id);
+
+  function uid() {
+    return (crypto.randomUUID ? crypto.randomUUID() : 'id-' + Date.now() + '-' + Math.random().toString(16).slice(2));
+  }
+
+  function todayStr() {
+    const d = new Date();
+    return d.toISOString().slice(0, 10);
+  }
+
+  function formatDateHeading(dateStr) {
+    const d = new Date(dateStr + 'T00:00:00');
+    const opts = { weekday: 'long', month: 'long', day: 'numeric' };
+    const heading = d.toLocaleDateString(undefined, opts);
+    if (dateStr === todayStr()) return heading + ' · today';
+    return heading;
+  }
+
+  function showBanner(msg) {
+    el('statusBanner').innerHTML = '<div class="status-banner">' + msg + '</div>';
+  }
+  function clearBanner() { el('statusBanner').innerHTML = ''; }
+
+  let toastTimer = null;
+  function showToast(msg) {
+    const t = el('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  // ---------- Storage ----------
+  // Subjects and entries are namespaced per student id, so several students
+  // can use the same dashboard (e.g. a shared classroom device) without
+  // seeing each other's data.
+  //
+  // This app can run two ways: inside Claude's own artifact preview (which
+  // provides window.storage), or as a plain downloaded HTML file opened in
+  // any browser (which does not). storageGet/storageSet use window.storage
+  // when it's present and fall back to the browser's own localStorage
+  // otherwise, so saving works either way.
+
+  const hasCloudStorage = (typeof window !== 'undefined') &&
+    !!window.storage && typeof window.storage.get === 'function' && typeof window.storage.set === 'function';
+
+  async function storageGet(key) {
+    if (hasCloudStorage) {
+      try {
+        const r = await window.storage.get(key, false);
+        return r ? r.value : null;
+      } catch (e) {
+        return null; // key not found or read failed
+      }
+    }
+    try {
+      return localStorage.getItem(key);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async function storageSet(key, value) {
+    if (hasCloudStorage) {
+      try {
+        await window.storage.set(key, value, false);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+    try {
+      localStorage.setItem(key, value);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function subjectsKey(id) { return 'subjects__' + id; }
+  function entriesKey(id) { return 'entries__' + id; }
+
+  async function loadRegistry() {
+    const raw = await storageGet(REGISTRY_KEY);
+    if (!raw) return [];
+    try { return JSON.parse(raw); } catch (e) { return []; }
+  }
+
+  async function saveRegistry() {
+    const ok = await storageSet(REGISTRY_KEY, JSON.stringify(state.registry));
+    if (!ok) showBanner('Your profile list could not be saved on this device just now. Try again in a moment.');
+  }
+
+  async function loadActiveId() {
+    return await storageGet(ACTIVE_KEY);
+  }
+
+  async function saveActiveId(id) {
+    await storageSet(ACTIVE_KEY, id);
+  }
+
+  async function loadData() {
+    const rawSubjects = await storageGet(subjectsKey(state.studentId));
+    try { state.subjects = rawSubjects ? JSON.parse(rawSubjects) : []; } catch (e) { state.subjects = []; }
+
+    const rawEntries = await storageGet(entriesKey(state.studentId));
+    try { state.entries = rawEntries ? JSON.parse(rawEntries) : []; } catch (e) { state.entries = []; }
+
+    state.loaded = true;
+  }
+
+  async function saveSubjects() {
+    const ok = await storageSet(subjectsKey(state.studentId), JSON.stringify(state.subjects));
+    if (!ok) showBanner('Your subjects could not be saved on this device just now. Try again in a moment.');
+  }
+
+  async function saveEntries() {
+    const ok = await storageSet(entriesKey(state.studentId), JSON.stringify(state.entries));
+    if (!ok) showBanner('Your entry could not be saved on this device just now. Try again in a moment.');
+  }
+
+  // ---------- Derived data ----------
+
+  function subjectById(id) {
+    return state.subjects.find((s) => s.id === id);
+  }
+
+  function calcStreak() {
+    const days = new Set(state.entries.map((e) => e.date));
+    let streak = 0;
+    const cur = new Date();
+    let dateStr = cur.toISOString().slice(0, 10);
+    if (!days.has(dateStr)) {
+      cur.setDate(cur.getDate() - 1);
+      dateStr = cur.toISOString().slice(0, 10);
+    }
+    while (days.has(dateStr)) {
+      streak++;
+      cur.setDate(cur.getDate() - 1);
+      dateStr = cur.toISOString().slice(0, 10);
+    }
+    return streak;
+  }
+
+  function calcWeekMinutes() {
+    const now = new Date();
+    const cutoff = new Date(now);
+    cutoff.setDate(cutoff.getDate() - 6);
+    cutoff.setHours(0, 0, 0, 0);
+    return state.entries
+      .filter((e) => new Date(e.date + 'T00:00:00') >= cutoff)
+      .reduce((sum, e) => sum + Number(e.minutes || 0), 0);
+  }
+
+  function calcTotalMinutes() {
+    return state.entries.reduce((sum, e) => sum + Number(e.minutes || 0), 0);
+  }
+
+  function calcMinutesBySubject() {
+    const map = {};
+    state.entries.forEach((e) => {
+      map[e.subjectId] = (map[e.subjectId] || 0) + Number(e.minutes || 0);
+    });
+    return map;
+  }
+
+  function minutesToHoursLabel(mins) {
+    const hrs = mins / 60;
+    if (hrs === 0) return '0h';
+    if (hrs < 10) return hrs.toFixed(1).replace(/\.0$/, '') + 'h';
+    return Math.round(hrs) + 'h';
+  }
+
+  // ---------- Rendering ----------
+
+  function renderTodayPill() {
+    const d = new Date();
+    el('todayPill').textContent = d.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+  }
+
+  function renderStudentControl() {
+    const name = state.studentName || 'Set your name';
+    el('studentNameLabel').textContent = name;
+    el('studentAvatar').textContent = (state.studentName || '?').trim().charAt(0).toUpperCase() || '?';
+    el('renameInput').value = state.studentName || '';
+    el('headerSubtitle').textContent = state.studentName
+      ? (state.studentName + "'s study timeline, subject by subject.")
+      : 'Track what you study each day, subject by subject.';
+    renderStudentSwitchList();
+  }
+
+  function renderStudentSwitchList() {
+    const list = el('studentSwitchList');
+    list.innerHTML = '';
+    const others = state.registry.filter((r) => r.id !== state.studentId);
+    if (others.length === 0) {
+      const li = document.createElement('li');
+      li.className = 'current';
+      li.textContent = 'No other profiles yet';
+      list.appendChild(li);
+      return;
+    }
+    others.forEach((r) => {
+      const li = document.createElement('li');
+      const nameSpan = document.createElement('span');
+      nameSpan.textContent = r.name;
+      const tag = document.createElement('span');
+      tag.className = 'tag';
+      tag.textContent = 'Switch';
+      li.appendChild(nameSpan);
+      li.appendChild(tag);
+      li.addEventListener('click', () => switchStudent(r.id));
+      list.appendChild(li);
+    });
+  }
+
+  function renderSwatchPicker() {
+    const wrap = el('swatchPicker');
+    wrap.innerHTML = '';
+    PALETTE.forEach((color) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'swatch' + (state.selectedSwatch === color ? ' selected' : '');
+      btn.style.background = color;
+      btn.addEventListener('click', () => {
+        state.selectedSwatch = color;
+        renderSwatchPicker();
+      });
+      wrap.appendChild(btn);
+    });
+  }
+
+  function renderUnderstandingPicker() {
+    const wrap = el('understandingPicker');
+    wrap.innerHTML = '';
+    for (let i = 1; i <= 5; i++) {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'u-dot' + (i <= state.understandingValue ? ' filled' : '');
+      dot.addEventListener('click', () => {
+        state.understandingValue = i;
+        renderUnderstandingPicker();
+      });
+      wrap.appendChild(dot);
+    }
+    const hint = document.createElement('span');
+    hint.className = 'u-hint';
+    hint.textContent = state.understandingValue + '/5';
+    wrap.appendChild(hint);
+  }
+
+  function renderSubjectList() {
+    const list = el('subjectList');
+    list.innerHTML = '';
+
+    if (state.subjects.length === 0) {
+      const note = document.createElement('div');
+      note.className = 'empty-note';
+      note.textContent = 'No subjects yet. Add one below to start logging.';
+      list.appendChild(note);
+      return;
+    }
+
+    const counts = {};
+    const minutesBySubject = calcMinutesBySubject();
+    state.entries.forEach((e) => { counts[e.subjectId] = (counts[e.subjectId] || 0) + 1; });
+
+    state.subjects.forEach((s) => {
+      const li = document.createElement('li');
+      li.className = 'subject-item' + (state.activeSubjectFilter === s.id ? ' active' : '');
+
+      const dot = document.createElement('span');
+      dot.className = 'subject-dot';
+      dot.style.background = s.color;
+
+      const name = document.createElement('span');
+      name.className = 'subject-name';
+      name.textContent = s.name;
+
+      const count = document.createElement('span');
+      count.className = 'subject-count';
+      count.textContent = minutesToHoursLabel(minutesBySubject[s.id] || 0);
+
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'subject-remove';
+      removeBtn.type = 'button';
+      removeBtn.textContent = '✕';
+      removeBtn.title = 'Remove subject';
+      removeBtn.addEventListener('click', async (ev) => {
+        ev.stopPropagation();
+        const entryCount = counts[s.id] || 0;
+        const msg = entryCount > 0
+          ? 'Remove "' + s.name + '" and its ' + entryCount + ' logged entries? This cannot be undone.'
+          : 'Remove "' + s.name + '"?';
+        if (!confirm(msg)) return;
+        state.subjects = state.subjects.filter((x) => x.id !== s.id);
+        state.entries = state.entries.filter((x) => x.subjectId !== s.id);
+        if (state.activeSubjectFilter === s.id) state.activeSubjectFilter = 'all';
+        await saveSubjects();
+        await saveEntries();
+        renderAll();
+      });
+
+      li.appendChild(dot);
+      li.appendChild(name);
+      li.appendChild(count);
+      li.appendChild(removeBtn);
+
+      li.addEventListener('click', () => {
+        state.activeSubjectFilter = state.activeSubjectFilter === s.id ? 'all' : s.id;
+        syncFilterSelect();
+        renderSubjectList();
+        renderTimeline();
+      });
+
+      list.appendChild(li);
+    });
+  }
+
+  function renderSubjectSelects() {
+    const entrySelect = el('entrySubjectSelect');
+    const filterSelect = el('filterSubjectSelect');
+    const prevEntryVal = entrySelect.value;
+
+    entrySelect.innerHTML = '';
+    if (state.subjects.length === 0) {
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = 'Add a subject first';
+      entrySelect.appendChild(opt);
+      entrySelect.disabled = true;
+    } else {
+      entrySelect.disabled = false;
+      state.subjects.forEach((s) => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = s.name;
+        entrySelect.appendChild(opt);
+      });
+      if (state.subjects.some((s) => s.id === prevEntryVal)) entrySelect.value = prevEntryVal;
+    }
+
+    filterSelect.innerHTML = '';
+    const allOpt = document.createElement('option');
+    allOpt.value = 'all';
+    allOpt.textContent = 'All subjects';
+    filterSelect.appendChild(allOpt);
+    state.subjects.forEach((s) => {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = s.name;
+      filterSelect.appendChild(opt);
+    });
+    filterSelect.value = state.activeSubjectFilter;
+  }
+
+  function syncFilterSelect() {
+    el('filterSubjectSelect').value = state.activeSubjectFilter;
+  }
+
+  function renderTimeline() {
+    const container = el('timelineContainer');
+    container.innerHTML = '';
+
+    if (state.subjects.length === 0) {
+      container.innerHTML = '<div class="empty-note">Add a subject, then log today\'s study session to begin your timeline.</div>';
+      return;
+    }
+
+    let entries = state.entries.slice();
+    if (state.activeSubjectFilter !== 'all') {
+      entries = entries.filter((e) => e.subjectId === state.activeSubjectFilter);
+    }
+    if (state.search.trim()) {
+      const q = state.search.trim().toLowerCase();
+      entries = entries.filter((e) =>
+        (e.topic || '').toLowerCase().includes(q) || (e.notes || '').toLowerCase().includes(q)
+      );
+    }
+
+    if (entries.length === 0) {
+      const msg = state.entries.length === 0
+        ? 'No entries yet. Log today\'s study session to begin your timeline.'
+        : 'No entries match your filters.';
+      container.innerHTML = '<div class="empty-note">' + msg + '</div>';
+      return;
+    }
+
+    entries.sort((a, b) => (b.date + b.createdAt).localeCompare(a.date + a.createdAt));
+
+    const groups = {};
+    entries.forEach((e) => {
+      if (!groups[e.date]) groups[e.date] = [];
+      groups[e.date].push(e);
+    });
+
+    Object.keys(groups).sort().reverse().forEach((date) => {
+      const groupDiv = document.createElement('div');
+      groupDiv.className = 'date-group';
+
+      const heading = document.createElement('div');
+      heading.className = 'date-heading';
+      heading.textContent = formatDateHeading(date);
+      groupDiv.appendChild(heading);
+
+      groups[date].forEach((entry) => {
+        const subject = subjectById(entry.subjectId);
+        const card = document.createElement('div');
+        card.className = 'entry-card';
+
+        const bar = document.createElement('div');
+        bar.className = 'entry-bar';
+        bar.style.background = subject ? subject.color : '#ccc';
+        card.appendChild(bar);
+
+        const body = document.createElement('div');
+        body.className = 'entry-body';
+
+        const topRow = document.createElement('div');
+        topRow.className = 'entry-top-row';
+        const topic = document.createElement('div');
+        topic.className = 'entry-topic';
+        topic.textContent = entry.topic || '(no topic given)';
+        const subjTag = document.createElement('div');
+        subjTag.className = 'entry-subject-tag';
+        subjTag.textContent = subject ? subject.name : 'Unknown subject';
+        topRow.appendChild(topic);
+        topRow.appendChild(subjTag);
+        body.appendChild(topRow);
+
+        if (entry.notes) {
+          const notes = document.createElement('div');
+          notes.className = 'entry-notes';
+          notes.textContent = entry.notes;
+          body.appendChild(notes);
+        }
+
+        const meta = document.createElement('div');
+        meta.className = 'entry-meta';
+        const mins = document.createElement('span');
+        mins.textContent = (entry.minutes || 0) + ' min';
+        meta.appendChild(mins);
+
+        const dots = document.createElement('span');
+        dots.className = 'u-mini-dots';
+        for (let i = 1; i <= 5; i++) {
+          const d = document.createElement('span');
+          d.className = 'u-mini-dot' + (i <= (entry.understanding || 0) ? ' on' : '');
+          dots.appendChild(d);
+        }
+        meta.appendChild(dots);
+        body.appendChild(meta);
+
+        card.appendChild(body);
+
+        const actions = document.createElement('div');
+        actions.className = 'entry-actions';
+        const editBtn = document.createElement('button');
+        editBtn.className = 'icon-btn';
+        editBtn.textContent = 'Edit';
+        editBtn.addEventListener('click', () => startEdit(entry.id));
+        const delBtn = document.createElement('button');
+        delBtn.className = 'icon-btn danger';
+        delBtn.textContent = 'Delete';
+        delBtn.addEventListener('click', async () => {
+          if (!confirm('Delete this entry?')) return;
+          state.entries = state.entries.filter((e) => e.id !== entry.id);
+          await saveEntries();
+          renderAll();
+        });
+        actions.appendChild(editBtn);
+        actions.appendChild(delBtn);
+        card.appendChild(actions);
+
+        groupDiv.appendChild(card);
+      });
+
+      container.appendChild(groupDiv);
+    });
+  }
+
+  function renderStats() {
+    el('streakStat').textContent = calcStreak();
+    el('weekStat').textContent = minutesToHoursLabel(calcWeekMinutes());
+    el('totalHoursStat').textContent = minutesToHoursLabel(calcTotalMinutes());
+    el('entryCountStat').textContent = state.entries.length;
+
+    const barsWrap = el('subjectBars');
+    barsWrap.innerHTML = '';
+    if (state.subjects.length === 0) {
+      barsWrap.innerHTML = '<div class="empty-note">Hours per subject will appear here once you add subjects and log entries.</div>';
+      return;
+    }
+    const minutesBySubject = calcMinutesBySubject();
+    const max = Math.max(1, ...state.subjects.map((s) => minutesBySubject[s.id] || 0));
+
+    state.subjects
+      .slice()
+      .sort((a, b) => (minutesBySubject[b.id] || 0) - (minutesBySubject[a.id] || 0))
+      .forEach((s) => {
+        const mins = minutesBySubject[s.id] || 0;
+        const row = document.createElement('div');
+        row.className = 'bar-row';
+        const top = document.createElement('div');
+        top.className = 'bar-row-top';
+        top.innerHTML = '<span>' + s.name + '</span><span>' + minutesToHoursLabel(mins) + '</span>';
+        const track = document.createElement('div');
+        track.className = 'bar-track';
+        const fill = document.createElement('div');
+        fill.className = 'bar-fill';
+        fill.style.width = Math.round((mins / max) * 100) + '%';
+        fill.style.background = s.color;
+        track.appendChild(fill);
+        row.appendChild(top);
+        row.appendChild(track);
+        barsWrap.appendChild(row);
+      });
+  }
+
+  function renderAll() {
+    renderSubjectList();
+    renderSubjectSelects();
+    renderTimeline();
+    renderStats();
+  }
+
+  // ---------- Editing ----------
+
+  function startEdit(entryId) {
+    const entry = state.entries.find((e) => e.id === entryId);
+    if (!entry) return;
+    state.editingEntryId = entryId;
+    el('entrySubjectSelect').value = entry.subjectId;
+    el('entryDateInput').value = entry.date;
+    el('entryTopicInput').value = entry.topic || '';
+    el('entryNotesInput').value = entry.notes || '';
+    el('entryMinutesInput').value = entry.minutes || '';
+    state.understandingValue = entry.understanding || 3;
+    renderUnderstandingPicker();
+    el('formTitle').textContent = 'Edit entry';
+    el('submitEntryBtn').textContent = 'Update entry';
+    el('cancelEditBtn').style.display = 'inline-block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function resetForm() {
+    state.editingEntryId = null;
+    el('entryDateInput').value = todayStr();
+    el('entryTopicInput').value = '';
+    el('entryNotesInput').value = '';
+    el('entryMinutesInput').value = '';
+    state.understandingValue = 3;
+    renderUnderstandingPicker();
+    el('formTitle').textContent = "Today's entry";
+    el('submitEntryBtn').textContent = 'Save entry';
+    el('cancelEditBtn').style.display = 'none';
+  }
+
+  // ---------- Student profiles ----------
+
+  function showWrap() {
+    el('welcomeScreen').style.display = 'none';
+    el('mainWrap').style.display = 'block';
+  }
+
+  function showWelcome() {
+    el('mainWrap').style.display = 'none';
+    el('welcomeScreen').style.display = 'block';
+    el('welcomeNameInput').value = '';
+    el('welcomeNameInput').focus();
+  }
+
+  function toggleStudentMenu(force) {
+    const menu = el('studentMenu');
+    if (typeof force === 'boolean') {
+      menu.classList.toggle('open', force);
+    } else {
+      menu.classList.toggle('open');
+    }
+  }
+
+  async function switchStudent(id) {
+    state.studentId = id;
+    const rec = state.registry.find((r) => r.id === id);
+    state.studentName = rec ? rec.name : '';
+    await saveActiveId(id);
+    await loadData();
+    clearBanner();
+    resetForm();
+    renderStudentControl();
+    renderAll();
+    toggleStudentMenu(false);
+    showWrap();
+  }
+
+  async function createStudentProfile(name) {
+    const id = uid();
+    state.registry.push({ id: id, name: name });
+    await saveRegistry();
+    await switchStudent(id);
+  }
+
+  async function renameCurrentStudent() {
+    const val = el('renameInput').value.trim();
+    if (!val || !state.studentId) return;
+    state.studentName = val;
+    const rec = state.registry.find((r) => r.id === state.studentId);
+    if (rec) {
+      rec.name = val;
+    } else {
+      state.registry.push({ id: state.studentId, name: val });
+    }
+    await saveRegistry();
+    renderStudentControl();
+    toggleStudentMenu(false);
+  }
+
+  // ---------- Event bindings ----------
+
+  function bindStudentEvents() {
+    el('studentMenuBtn').addEventListener('click', () => toggleStudentMenu());
+
+    document.addEventListener('click', (e) => {
+      const control = document.querySelector('.student-control');
+      if (control && !control.contains(e.target)) {
+        toggleStudentMenu(false);
+      }
+    });
+
+    el('saveNameBtn').addEventListener('click', renameCurrentStudent);
+    el('renameInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        renameCurrentStudent();
+      }
+    });
+
+    el('newStudentBtn').addEventListener('click', async () => {
+      const name = prompt("Enter the new student's name:");
+      if (!name || !name.trim()) return;
+      await createStudentProfile(name.trim());
+    });
+
+    el('welcomeStartBtn').addEventListener('click', async () => {
+      const name = el('welcomeNameInput').value.trim();
+      if (!name) return;
+      await createStudentProfile(name);
+    });
+    el('welcomeNameInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        el('welcomeStartBtn').click();
+      }
+    });
+  }
+
+  function bindEvents() {
+    el('subjectNameInput').addEventListener('input', () => {
+      el('subjectNameError').classList.remove('show');
+      el('subjectNameInput').classList.remove('input-error');
+    });
+
+    el('subjectForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nameInput = el('subjectNameInput');
+      const errorEl = el('subjectNameError');
+      const name = nameInput.value.trim();
+
+      if (!name) {
+        errorEl.textContent = 'Enter a subject name first.';
+        errorEl.classList.add('show');
+        nameInput.classList.add('input-error');
+        nameInput.focus();
+        return;
+      }
+      const isDuplicate = state.subjects.some((s) => s.name.toLowerCase() === name.toLowerCase());
+      if (isDuplicate) {
+        errorEl.textContent = 'That subject is already in your list.';
+        errorEl.classList.add('show');
+        nameInput.classList.add('input-error');
+        nameInput.focus();
+        return;
+      }
+
+      errorEl.classList.remove('show');
+      nameInput.classList.remove('input-error');
+
+      const newId = uid();
+      state.subjects.push({ id: newId, name: name, color: state.selectedSwatch });
+      nameInput.value = '';
+      state.selectedSwatch = PALETTE[state.subjects.length % PALETTE.length];
+      renderSwatchPicker();
+      await saveSubjects();
+      renderAll();
+      el('entrySubjectSelect').value = newId;
+      showToast('"' + name + '" added — pick it above to log today\u2019s session.');
+      nameInput.focus();
+    });
+
+    el('entryForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (state.subjects.length === 0) return;
+
+      const subjectId = el('entrySubjectSelect').value;
+      const date = el('entryDateInput').value || todayStr();
+      const topic = el('entryTopicInput').value.trim();
+      const notes = el('entryNotesInput').value.trim();
+      const minutes = Math.max(1, parseInt(el('entryMinutesInput').value || '0', 10) || 0);
+
+      if (!subjectId) return;
+
+      if (state.editingEntryId) {
+        const entry = state.entries.find((x) => x.id === state.editingEntryId);
+        if (entry) {
+          entry.subjectId = subjectId;
+          entry.date = date;
+          entry.topic = topic;
+          entry.notes = notes;
+          entry.minutes = minutes;
+          entry.understanding = state.understandingValue;
+        }
+      } else {
+        state.entries.push({
+          id: uid(),
+          subjectId: subjectId,
+          date: date,
+          topic: topic,
+          notes: notes,
+          minutes: minutes,
+          understanding: state.understandingValue,
+          createdAt: new Date().toISOString()
+        });
+      }
+
+      await saveEntries();
+      resetForm();
+      renderAll();
+    });
+
+    el('cancelEditBtn').addEventListener('click', () => {
+      resetForm();
+    });
+
+    el('searchInput').addEventListener('input', (e) => {
+      state.search = e.target.value;
+      renderTimeline();
+    });
+
+    el('filterSubjectSelect').addEventListener('change', (e) => {
+      state.activeSubjectFilter = e.target.value;
+      renderSubjectList();
+      renderTimeline();
+    });
+  }
+
+  // ---------- Init ----------
+
+  async function init() {
+    renderTodayPill();
+    renderSwatchPicker();
+    renderUnderstandingPicker();
+    el('entryDateInput').value = todayStr();
+    bindEvents();
+    bindStudentEvents();
+
+    state.registry = await loadRegistry();
+    const activeId = await loadActiveId();
+
+    if (activeId && state.registry.some((r) => r.id === activeId)) {
+      state.studentId = activeId;
+      state.studentName = state.registry.find((r) => r.id === activeId).name;
+      await loadData();
+      clearBanner();
+      renderStudentControl();
+      renderAll();
+      showWrap();
+    } else if (state.registry.length > 0) {
+      // No active pointer saved (e.g. cleared), fall back to the first known profile.
+      await switchStudent(state.registry[0].id);
+    } else {
+      showWelcome();
+    }
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
