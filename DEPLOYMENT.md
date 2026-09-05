@@ -43,16 +43,18 @@ const firebaseConfig = {
 
 3. **Add Environment Variables**
    - In the deployment setup, click "Environment Variables"
-   - Add all 6 Firebase variables:
+   - Add all 6 Firebase variables with **`visibility: config`**:
    
-   | Name | Value |
-   |------|-------|
-   | `VITE_FIREBASE_API_KEY` | Your Firebase API key |
-   | `VITE_FIREBASE_AUTH_DOMAIN` | Your Firebase auth domain |
-   | `VITE_FIREBASE_PROJECT_ID` | Your Firebase project ID |
-   | `VITE_FIREBASE_STORAGE_BUCKET` | Your Firebase storage bucket |
-   | `VITE_FIREBASE_MESSAGING_SENDER_ID` | Your Firebase sender ID |
-   | `VITE_FIREBASE_APP_ID` | Your Firebase app ID |
+   | Name | Value | Visibility |
+   |------|-------|------------|
+   | `VITE_FIREBASE_API_KEY` | Your Firebase API key | **config** |
+   | `VITE_FIREBASE_AUTH_DOMAIN` | Your Firebase auth domain | **config** |
+   | `VITE_FIREBASE_PROJECT_ID` | Your Firebase project ID | **config** |
+   | `VITE_FIREBASE_STORAGE_BUCKET` | Your Firebase storage bucket | **config** |
+   | `VITE_FIREBASE_MESSAGING_SENDER_ID` | Your Firebase sender ID | **config** |
+   | `VITE_FIREBASE_APP_ID` | Your Firebase app ID | **config** |
+
+   **⚠️ Important:** Use `visibility: config` (not `secret`) for all VITE_ prefixed variables
 
 4. **Deploy**
    - Click "Deploy"
@@ -154,16 +156,23 @@ To test locally with your Firebase configuration:
    npm run dev
    ```
 
-## 🔍 Troubleshooting
+## 🛠️ Troubleshooting
 
 ### Build Fails
 - **Check environment variables**: Ensure all 6 Firebase variables are set
 - **Verify variable names**: Must match exactly (case-sensitive)
+- **Check visibility setting**: Use `visibility: config` for VITE_ prefixed variables
 - **Check build logs**: Look for specific error messages in Vercel dashboard
+
+### "Environment variables with a public framework prefix cannot use `visibility: secret`"
+- **Solution**: Change all VITE_ variables to use `visibility: config` instead of `secret`
+- **Why**: Vercel requires this for public framework prefixes like VITE_, NEXT_PUBLIC_, etc.
+- **Security**: This is correct - Firebase config is meant to be public in client-side apps
 
 ### App Shows "Firebase Configuration Required"
 - **Environment variables not set**: Add them in Vercel dashboard
 - **Incorrect values**: Double-check Firebase config values
+- **Wrong visibility**: Ensure all variables use `visibility: config`
 - **Redeploy needed**: Trigger a new deployment after adding variables
 
 ### Authentication Doesn't Work

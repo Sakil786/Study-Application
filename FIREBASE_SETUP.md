@@ -108,18 +108,23 @@ After creating your Firebase project:
 
 2. **Add Environment Variables**
    - Go to Settings → Environment Variables
-   - Add each Firebase config value:
+   - Add each Firebase config value with **`visibility: config`** (not secret):
 
-| Variable Name | Example Value | Description |
-|---------------|---------------|-------------|
-| `VITE_FIREBASE_API_KEY` | `AIzaSyC...` | Firebase API Key |
-| `VITE_FIREBASE_AUTH_DOMAIN` | `myapp.firebaseapp.com` | Auth Domain |
-| `VITE_FIREBASE_PROJECT_ID` | `my-study-app` | Project ID |
-| `VITE_FIREBASE_STORAGE_BUCKET` | `myapp.appspot.com` | Storage Bucket |
-| `VITE_FIREBASE_MESSAGING_SENDER_ID` | `123456789` | Sender ID |
-| `VITE_FIREBASE_APP_ID` | `1:123:web:abc123` | App ID |
+| Variable Name | Example Value | Visibility | Description |
+|---------------|---------------|------------|-------------|
+| `VITE_FIREBASE_API_KEY` | `AIzaSyC...` | **config** | Firebase API Key |
+| `VITE_FIREBASE_AUTH_DOMAIN` | `myapp.firebaseapp.com` | **config** | Auth Domain |
+| `VITE_FIREBASE_PROJECT_ID` | `my-study-app` | **config** | Project ID |
+| `VITE_FIREBASE_STORAGE_BUCKET` | `myapp.appspot.com` | **config** | Storage Bucket |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | `123456789` | **config** | Sender ID |
+| `VITE_FIREBASE_APP_ID` | `1:123:web:abc123` | **config** | App ID |
 
-3. **Deploy**
+3. **Important Notes:**
+   - ⚠️ **Use `visibility: config`** - Not `secret` (Vercel requirement for VITE_ prefixed variables)
+   - ℹ️ **These values are public** - Firebase config is meant to be exposed in client-side code
+   - 🔒 **Security comes from Firebase Auth + Firestore rules** - Not from hiding these values
+
+4. **Deploy**
    - Vercel will automatically redeploy with your Firebase config
    - Your app will be ready to use immediately!
 
