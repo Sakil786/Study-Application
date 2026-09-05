@@ -3458,7 +3458,8 @@ function setupEventListeners() {
 
   // Close menu when clicking outside
   document.addEventListener('click', (e) => {
-    if (!el('studentControl').contains(e.target)) {
+    const studentControl = document.querySelector('.student-control');
+    if (studentControl && !studentControl.contains(e.target)) {
       el('studentMenu').classList.remove('open');
     }
   });
