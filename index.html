@@ -484,15 +484,39 @@
 
 <div class="toast" id="toast"></div>
 
-<div class="welcome-screen" id="welcomeScreen" style="display:none;">
-  <div class="panel">
-    <h1>Welcome to The Study Log</h1>
-    <p class="sub">Enter your name to start your own study timeline. If others share this device, everyone keeps their own subjects and entries, and you can switch profiles anytime from the top corner.</p>
-    <div class="field">
-      <label class="field-label" for="welcomeNameInput">Your name</label>
-      <input type="text" id="welcomeNameInput" placeholder="e.g. Aisha Rao" maxlength="40" />
+<div class="auth-screen" id="authScreen" style="display:none;">
+  <div class="panel" style="max-width: 400px; margin: 90px auto; padding: 24px;">
+    <h1 id="authTitle">Welcome to The Study Log</h1>
+    <p class="sub" id="authSubtitle">Create an account to start tracking your study sessions</p>
+    
+    <form id="authForm">
+      <div class="field">
+        <label class="field-label" for="authUsername">Username</label>
+        <input type="text" id="authUsername" placeholder="Choose a username" maxlength="30" required />
+        <div class="field-error" id="usernameError"></div>
+      </div>
+      
+      <div class="field" id="emailField">
+        <label class="field-label" for="authEmail">Email (optional)</label>
+        <input type="email" id="authEmail" placeholder="your@email.com" />
+      </div>
+      
+      <div class="field">
+        <label class="field-label" for="authPassword">Password</label>
+        <input type="password" id="authPassword" placeholder="At least 6 characters" minlength="6" required />
+        <div class="field-error" id="passwordError"></div>
+      </div>
+      
+      <button type="submit" class="btn" id="authSubmitBtn" style="width: 100%; margin-top: 8px;">Sign Up</button>
+      <div class="field-error" id="authError" style="margin-top: 8px;"></div>
+    </form>
+    
+    <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--card-border);">
+      <p style="font-size: 14px; color: var(--ink-soft); margin: 0 0 10px;">
+        <span id="authSwitchText">Already have an account?</span>
+        <button type="button" id="authSwitchBtn" style="background: none; border: none; color: var(--forest); cursor: pointer; font-weight: 600;">Log In</button>
+      </p>
     </div>
-    <button type="button" class="btn" id="welcomeStartBtn">Start my log</button>
   </div>
 </div>
 
@@ -502,26 +526,22 @@
       <h1>The Study Log</h1>
       <p id="headerSubtitle">Track what you study each day, subject by subject.</p>
     </div>
-    <div class="header-right">
-      <div class="today-pill" id="todayPill"></div>
-      <div class="student-control">
-        <button type="button" class="student-btn" id="studentMenuBtn">
-          <span class="student-avatar" id="studentAvatar">?</span>
-          <span id="studentNameLabel">Set your name</span>
-        </button>
-        <div class="student-menu" id="studentMenu">
-          <label class="field-label" for="renameInput">Your name</label>
-          <input type="text" id="renameInput" maxlength="40" placeholder="e.g. Aisha Rao" />
-          <div class="btn-row" style="margin-top:8px;">
-            <button type="button" class="btn" id="saveNameBtn" style="padding:7px 12px;font-size:13px;">Save</button>
+      <div class="header-right">
+        <div class="today-pill" id="todayPill"></div>
+        <div class="student-control">
+          <button type="button" class="student-btn" id="studentMenuBtn">
+            <span class="student-avatar" id="studentAvatar">?</span>
+            <span id="studentNameLabel">Loading...</span>
+          </button>
+          <div class="student-menu" id="studentMenu">
+            <div style="padding: 0 0 12px; border-bottom: 1px solid var(--card-border); margin-bottom: 12px;">
+              <div style="font-size: 12.5px; color: var(--ink-soft); font-weight: 600;">Logged in as</div>
+              <div style="font-weight: 600; margin-top: 2px;" id="loggedInUser">Username</div>
+            </div>
+            <button type="button" class="btn secondary" id="logoutBtn" style="width:100%;padding:7px 12px;font-size:13px;">Sign Out</button>
           </div>
-          <hr />
-          <label class="field-label">Switch student</label>
-          <ul class="student-menu-list" id="studentSwitchList"></ul>
-          <button type="button" class="btn secondary" id="newStudentBtn" style="width:100%;padding:7px 12px;font-size:13px;">+ New student profile</button>
         </div>
       </div>
-    </div>
   </header>
 
   <div id="statusBanner"></div>
@@ -627,13 +647,10 @@
 <script>
 (function () {
   const PALETTE = ['#B5533C', '#2D6E8E', '#8A6BA1', '#C98A2B', '#5C7A4A', '#55627A', '#A24C63'];
-  const REGISTRY_KEY = 'student-registry';
-  const ACTIVE_KEY = 'active-student';
-
+  
   const state = {
-    studentId: null,
-    studentName: '',
-    registry: [],
+    user: null,
+    token: null,
     subjects: [],
     entries: [],
     activeSubjectFilter: 'all',
@@ -641,10 +658,42 @@
     selectedSwatch: PALETTE[0],
     editingEntryId: null,
     understandingValue: 3,
-    loaded: false
+    loaded: false,
+    isLogin: false
   };
 
   const el = (id) => document.getElementById(id);
+  
+  // API Helper functions
+  async function apiCall(endpoint, options = {}) {
+    const token = localStorage.getItem('study_app_token');
+    const headers = {
+      'Content-Type': 'application/json',
+      ...options.headers
+    };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    try {
+      const response = await fetch(`/api${endpoint}`, {
+        ...options,
+        headers
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'API request failed');
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('API call error:', error);
+      throw error;
+    }
+  }
 
   function uid() {
     return (crypto.randomUUID ? crypto.randomUUID() : 'id-' + Date.now() + '-' + Math.random().toString(16).slice(2));
