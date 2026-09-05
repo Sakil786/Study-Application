@@ -2556,9 +2556,16 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+let auth, db;
+try {
+  firebase.initializeApp(firebaseConfig);
+  auth = firebase.auth();
+  db = firebase.firestore();
+  console.log('✅ Firebase initialized successfully');
+} catch (error) {
+  console.error('❌ Firebase initialization error:', error);
+  alert('Firebase initialization failed: ' + error.message);
+}
 
 // Application state
 const state = {
@@ -3551,16 +3558,37 @@ function setupEventListeners() {
 function init() {
   showLoadingScreen();
   
+  // Debug logging
+  console.log('🔧 Initializing Study Log App...');
+  console.log('📋 Firebase Config:', {
+    apiKey: firebaseConfig.apiKey.substring(0, 20) + '...',
+    projectId: firebaseConfig.projectId,
+    authDomain: firebaseConfig.authDomain
+  });
+  
   // Check Firebase configuration
-  if (!isFirebaseConfigured()) {
+  const isConfigured = isFirebaseConfigured();
+  console.log('✅ Firebase configured:', isConfigured);
+  
+  if (!isConfigured) {
+    console.error('❌ Firebase configuration invalid');
     showFirebaseSetupInstructions();
     return;
   }
   
   setupEventListeners();
   
+  // Add timeout fallback in case auth state doesn't fire
+  const authTimeout = setTimeout(() => {
+    console.error('⏱️ Auth state timeout - showing auth screen');
+    showAuthScreen();
+  }, 5000);
+  
   // Listen for auth state changes
   auth.onAuthStateChanged(async (user) => {
+    clearTimeout(authTimeout);
+    console.log('👤 Auth state changed:', user ? 'Logged in' : 'Not logged in');
+    
     if (user) {
       state.user = user;
       try {
@@ -3577,6 +3605,10 @@ function init() {
       state.entries = [];
       showAuthScreen();
     }
+  }, (error) => {
+    clearTimeout(authTimeout);
+    console.error('❌ Auth state error:', error);
+    showAuthScreen();
   });
 }
 
