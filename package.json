@@ -1,13 +1,5 @@
 {
   "name": "study-log-app",
   "version": "1.0.0",
-  "description": "A study tracking application with Firebase backend",
-  "main": "build.js",
-  "scripts": {
-    "build": "node build.js",
-    "dev": "node build.js && npx serve public",
-    "start": "node build.js"
-  },
-  "dependencies": {},
-  "devDependencies": {}
+  "description": "A study tracking application with Firebase backend"
 }

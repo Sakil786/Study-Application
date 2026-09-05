@@ -2535,17 +2535,29 @@
   </div>
 </div>
 <script>
-// Firebase configuration - You'll need to replace this with your own config
+// Firebase configuration - Replace these values with your Firebase project config
+// Get these from: Firebase Console → Project Settings → General → Your apps
 const firebaseConfig = {
-  // Note: For demo purposes, these are placeholder values
-  // Users need to create their own Firebase project and replace these
   apiKey: "demo-api-key-replace-with-your-own",
   authDomain: "demo-project.firebaseapp.com",
-  projectId: "demo-project",
+  projectId: "demo-project", 
   storageBucket: "demo-project.appspot.com",
   messagingSenderId: "123456789",
   appId: "1:123456789:web:demo-app-id"
 };
+
+// Override with actual config if you have one
+// Uncomment and replace with your real Firebase config:
+/*
+const firebaseConfig = {
+  apiKey: "your-actual-api-key",
+  authDomain: "your-project.firebaseapp.com",
+  projectId: "your-project-id",
+  storageBucket: "your-project.appspot.com", 
+  messagingSenderId: "your-sender-id",
+  appId: "your-app-id"
+};
+*/
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
