@@ -32,11 +32,13 @@ const MODEL_CONFIGS = {
   'moonshotai/kimi-k3': { 
     provider: 'nvidia', 
     name: 'moonshotai/kimi-k3',
+    needsReasoningEffort: true,
     needsThinkingControl: false
   },
   'deepseek-ai/deepseek-v4-pro-0813': { 
     provider: 'nvidia', 
     name: 'deepseek-ai/deepseek-v4-pro-0813',
+    needsReasoningEffort: false,
     needsThinkingControl: true
   }
 };
@@ -120,14 +122,20 @@ export default async function handler(req, res) {
         requestBody.reasoning_effort = 'medium';
       }
     } else if (modelConfig.provider === 'nvidia') {
-      // NVIDIA-specific parameters (matching SDK example)
+      // NVIDIA-specific parameters (matching SDK examples)
       requestBody.temperature = 1;
-      requestBody.top_p = 0.95;
       requestBody.max_tokens = 16384;
-      requestBody.seed = 42;
+      requestBody.seed = 0;
       
-      // Add thinking control for DeepSeek models
+      // Add reasoning_effort for KIMI K3 model
+      if (modelConfig.needsReasoningEffort) {
+        requestBody.reasoning_effort = 'max';
+      }
+      
+      // Add top_p and thinking control for DeepSeek models
       if (modelConfig.needsThinkingControl) {
+        requestBody.top_p = 0.95;
+        requestBody.seed = 42; // DeepSeek uses seed 42
         requestBody.extra_body = {
           chat_template_kwargs: {
             thinking: false
