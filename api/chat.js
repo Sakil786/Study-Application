@@ -28,9 +28,17 @@ const MODEL_CONFIGS = {
     needsReasoningEffort: false
   },
   
-  // NVIDIA models
-  'moonshotai/kimi-k3': { provider: 'nvidia', name: 'moonshotai/kimi-k3' },
-  'deepseek-ai/deepseek-v4-pro-0813': { provider: 'nvidia', name: 'deepseek/deepseek-r1' }
+  // NVIDIA models - Using exact names from NVIDIA API
+  'moonshotai/kimi-k3': { 
+    provider: 'nvidia', 
+    name: 'moonshotai/kimi-k3',
+    needsThinkingControl: false
+  },
+  'deepseek-ai/deepseek-v4-pro-0813': { 
+    provider: 'nvidia', 
+    name: 'deepseek-ai/deepseek-v4-pro-0813',
+    needsThinkingControl: true
+  }
 };
 
 export default async function handler(req, res) {
@@ -95,18 +103,37 @@ export default async function handler(req, res) {
       }
     ];
 
-    // Build request body
+    // Build request body based on provider
     const requestBody = {
       model: modelConfig.name,
       messages: messages,
-      temperature: 0.7,
-      max_tokens: 2048,
       stream: false
     };
 
-    // Add reasoning_effort for models that support it
-    if (modelConfig.needsReasoningEffort) {
-      requestBody.reasoning_effort = 'medium';
+    // Add provider-specific parameters
+    if (modelConfig.provider === 'groq') {
+      requestBody.temperature = 0.7;
+      requestBody.max_tokens = 2048;
+      
+      // Add reasoning_effort for Groq models that support it
+      if (modelConfig.needsReasoningEffort) {
+        requestBody.reasoning_effort = 'medium';
+      }
+    } else if (modelConfig.provider === 'nvidia') {
+      // NVIDIA-specific parameters (matching SDK example)
+      requestBody.temperature = 1;
+      requestBody.top_p = 0.95;
+      requestBody.max_tokens = 16384;
+      requestBody.seed = 42;
+      
+      // Add thinking control for DeepSeek models
+      if (modelConfig.needsThinkingControl) {
+        requestBody.extra_body = {
+          chat_template_kwargs: {
+            thinking: false
+          }
+        };
+      }
     }
 
     // Make API request
