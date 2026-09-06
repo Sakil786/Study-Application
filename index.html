@@ -1537,12 +1537,12 @@ async function logout() {
 async function initializeUserData() {
   const userId = state.user.uid;
   
-  // Load subjects
-  const subjectsSnapshot = await db.collection('users').doc(userId).collection('subjects').get();
+  // Load subjects - using consistent path with share feature
+  const subjectsSnapshot = await db.collection('subjects').doc(userId).collection('items').get();
   state.subjects = subjectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   
-  // Load entries
-  const entriesSnapshot = await db.collection('users').doc(userId).collection('entries').get();
+  // Load entries - using consistent path with share feature
+  const entriesSnapshot = await db.collection('entries').doc(userId).collection('items').get();
   state.entries = entriesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   
   console.log(`✅ Loaded ${state.subjects.length} subjects and ${state.entries.length} entries`);
@@ -1561,7 +1561,7 @@ async function addSubject(name, color) {
   const userId = state.user.uid;
   const newSubject = { name, color };
   
-  const docRef = await db.collection('users').doc(userId).collection('subjects').add(newSubject);
+  const docRef = await db.collection('subjects').doc(userId).collection('items').add(newSubject);
   state.subjects.push({ id: docRef.id, ...newSubject });
   
   console.log('✅ Added subject:', name);
@@ -1571,12 +1571,12 @@ async function removeSubject(subjectId) {
   const userId = state.user.uid;
   
   // Remove subject
-  await db.collection('users').doc(userId).collection('subjects').doc(subjectId).delete();
+  await db.collection('subjects').doc(userId).collection('items').doc(subjectId).delete();
   
   // Remove all entries for this subject
   const entriesToDelete = state.entries.filter(e => e.subjectId === subjectId);
   for (const entry of entriesToDelete) {
-    await db.collection('users').doc(userId).collection('entries').doc(entry.id).delete();
+    await db.collection('entries').doc(userId).collection('items').doc(entry.id).delete();
   }
   
   state.subjects = state.subjects.filter(s => s.id !== subjectId);
@@ -1592,7 +1592,7 @@ async function addEntry(entryData) {
     createdAt: new Date().toISOString()
   };
   
-  const docRef = await db.collection('users').doc(userId).collection('entries').add(newEntry);
+  const docRef = await db.collection('entries').doc(userId).collection('items').add(newEntry);
   state.entries.push({ id: docRef.id, ...newEntry });
   
   console.log('✅ Added entry');
@@ -1602,7 +1602,7 @@ async function addEntry(entryData) {
 async function updateEntry(entryId, entryData) {
   const userId = state.user.uid;
   
-  await db.collection('users').doc(userId).collection('entries').doc(entryId).update(entryData);
+  await db.collection('entries').doc(userId).collection('items').doc(entryId).update(entryData);
   
   const entry = state.entries.find(e => e.id === entryId);
   if (entry) {
@@ -1616,7 +1616,7 @@ async function updateEntry(entryId, entryData) {
 async function deleteEntry(entryId) {
   const userId = state.user.uid;
   
-  await db.collection('users').doc(userId).collection('entries').doc(entryId).delete();
+  await db.collection('entries').doc(userId).collection('items').doc(entryId).delete();
   state.entries = state.entries.filter(e => e.id !== entryId);
   
   console.log('✅ Deleted entry');
@@ -2353,7 +2353,7 @@ const playground = {
 
     try {
       const userId = state.user.uid;
-      await db.collection('users').doc(userId).collection('chats').add({
+      await db.collection('chatHistory').doc(userId).collection('chats').add({
         userMessage,
         aiMessage,
         model,
