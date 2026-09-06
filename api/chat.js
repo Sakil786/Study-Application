@@ -4,11 +4,13 @@
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const NVIDIA_API_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
 
-// Model configuration
+// Model configuration - Updated with currently supported models
 const MODEL_CONFIGS = {
-  // Groq models
-  'openai/gpt-oss-120b': { provider: 'groq', name: 'llama-3.3-70b-versatile' },
-  'qwen/qwen3.6-27b': { provider: 'groq', name: 'llama3-groq-70b-8192-tool-use-preview' },
+  // Groq models (as of 2024)
+  'llama-3.3-70b': { provider: 'groq', name: 'llama-3.3-70b-versatile' },
+  'llama-3.1-70b': { provider: 'groq', name: 'llama-3.1-70b-versatile' },
+  'mixtral-8x7b': { provider: 'groq', name: 'mixtral-8x7b-32768' },
+  'gemma2-9b': { provider: 'groq', name: 'gemma2-9b-it' },
   
   // NVIDIA models
   'moonshotai/kimi-k3': { provider: 'nvidia', name: 'moonshotai/kimi-k3' },
