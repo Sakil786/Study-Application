@@ -4,15 +4,31 @@
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const NVIDIA_API_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
 
-// Model configuration - Maps user-friendly names to actual API model names
+// Model configuration - Using actual Groq model identifiers
 const MODEL_CONFIGS = {
-  // Groq models - Using actual Groq API model identifiers
-  'qwen/qwen3.6-27b': { provider: 'groq', name: 'llama-3.1-70b-versatile' }, // Qwen alternative (Groq doesn't have Qwen)
-  'openai/gpt-oss-120b': { provider: 'groq', name: 'llama-3.3-70b-versatile' }, // Closest to GPT-OSS
-  'llama-3.3-70b-specdec': { provider: 'groq', name: 'llama-3.3-70b-specdec' }, // Speculative decoding version
-  'mixtral-8x7b': { provider: 'groq', name: 'mixtral-8x7b-32768' }, // Bonus: Fast model
+  // Groq models - Real model names from Groq API
+  'openai/gpt-oss-120b': { 
+    provider: 'groq', 
+    name: 'openai/gpt-oss-120b',
+    needsReasoningEffort: true 
+  },
+  'qwen/qwen3.6-27b': { 
+    provider: 'groq', 
+    name: 'qwen/qwen3.6-27b',
+    needsReasoningEffort: false
+  },
+  'llama-3.1-8b': { 
+    provider: 'groq', 
+    name: 'llama-3.1-8b-instant',
+    needsReasoningEffort: false
+  },
+  'mixtral-8x7b': { 
+    provider: 'groq', 
+    name: 'mixtral-8x7b-32768',
+    needsReasoningEffort: false
+  },
   
-  // NVIDIA models - Keep as requested
+  // NVIDIA models
   'moonshotai/kimi-k3': { provider: 'nvidia', name: 'moonshotai/kimi-k3' },
   'deepseek-ai/deepseek-v4-pro-0813': { provider: 'nvidia', name: 'deepseek/deepseek-r1' }
 };
@@ -79,6 +95,20 @@ export default async function handler(req, res) {
       }
     ];
 
+    // Build request body
+    const requestBody = {
+      model: modelConfig.name,
+      messages: messages,
+      temperature: 0.7,
+      max_tokens: 2048,
+      stream: false
+    };
+
+    // Add reasoning_effort for models that support it
+    if (modelConfig.needsReasoningEffort) {
+      requestBody.reasoning_effort = 'medium';
+    }
+
     // Make API request
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -86,20 +116,17 @@ export default async function handler(req, res) {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        model: modelConfig.name,
-        messages: messages,
-        temperature: 0.7,
-        max_tokens: 2000,
-        stream: false
-      })
+      body: JSON.stringify(requestBody)
     });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       console.error('API Error:', response.status, errorData);
+      console.error('Attempted model:', modelConfig.name);
+      console.error('Provider:', modelConfig.provider);
       return res.status(response.status).json({ 
-        error: `AI API error: ${errorData.error?.message || response.statusText}` 
+        error: `AI API error: ${errorData.error?.message || response.statusText}`,
+        details: `Model: ${modelConfig.name}, Provider: ${modelConfig.provider}`
       });
     }
 
