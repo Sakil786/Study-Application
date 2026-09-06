@@ -172,6 +172,21 @@
     flex-wrap: wrap; 
   }
 
+  .share-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-pill);
+    padding: 7px 14px;
+    font-size: 13px;
+    color: var(--ink);
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .share-btn:hover { background: rgba(34,49,79,0.05); }
+
   .student-control { 
     position: relative; 
   }
@@ -832,6 +847,239 @@
     }
   }
 
+  /* ---------- Share Progress Modal ---------- */
+
+  .share-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(34,49,79,0.5);
+    z-index: 1001;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+
+  .share-overlay.open {
+    display: flex;
+  }
+
+  .share-modal {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(34,49,79,0.25);
+  }
+
+  .share-modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--card-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .share-modal-header h2 {
+    font-family: 'Lora', serif;
+    font-size: 20px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .share-modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: var(--ink-faint);
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+
+  .share-modal-close:hover {
+    color: var(--ink);
+  }
+
+  .share-modal-body {
+    padding: 24px;
+  }
+
+  .share-section {
+    margin-bottom: 28px;
+  }
+
+  .share-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .share-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .share-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px;
+    background: #fff;
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+
+  .toggle-label {
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  .toggle-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background: var(--card-border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .toggle-switch.active {
+    background: var(--forest);
+  }
+
+  .toggle-knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+  }
+
+  .toggle-switch.active .toggle-knob {
+    transform: translateX(20px);
+  }
+
+  .share-info-box {
+    background: rgba(63,108,81,0.08);
+    border: 1px solid rgba(63,108,81,0.2);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+
+  .email-display {
+    background: #fff;
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 14px;
+    font-family: monospace;
+    color: var(--ink);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+  }
+
+  .copy-btn {
+    background: var(--forest);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .copy-btn:hover {
+    background: var(--forest-dark);
+  }
+
+  .view-progress-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .share-divider {
+    height: 1px;
+    background: var(--card-border);
+    margin: 24px 0;
+  }
+
+  .viewing-banner {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    padding: 16px 24px;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(102,126,234,0.3);
+  }
+
+  .viewing-banner.show {
+    display: flex;
+  }
+
+  .viewing-info {
+    flex: 1;
+  }
+
+  .viewing-info h3 {
+    margin: 0 0 4px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .viewing-info p {
+    margin: 0;
+    font-size: 13px;
+    opacity: 0.9;
+  }
+
+  .back-to-my-dashboard {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+
+  .back-to-my-dashboard:hover {
+    background: rgba(255,255,255,0.3);
+  }
+
 </style>
 </head>
 <body>
@@ -884,6 +1132,9 @@
       <p id="headerSubtitle">Track what you study each day, subject by subject.</p>
     </div>
       <div class="header-right">
+        <button type="button" class="share-btn" id="shareBtn" style="display: none;">
+          🔗 Share Progress
+        </button>
         <div class="today-pill" id="todayPill"></div>
         <div class="student-control">
           <button type="button" class="student-btn" id="studentMenuBtn">
@@ -900,6 +1151,17 @@
         </div>
       </div>
   </header>
+
+  <!-- Viewing Banner (shown when viewing someone else's progress) -->
+  <div class="viewing-banner" id="viewingBanner">
+    <div class="viewing-info">
+      <h3>👀 Viewing <span id="viewingUserName">User's</span> Progress</h3>
+      <p id="viewingUserEmail">user@example.com</p>
+    </div>
+    <button type="button" class="back-to-my-dashboard" id="backToMyDashboard">
+      ← Back to My Dashboard
+    </button>
+  </div>
 
   <div id="statusBanner"></div>
 
@@ -1054,6 +1316,59 @@
   </div>
 </div>
 
+<!-- Share Progress Modal -->
+<div class="share-overlay" id="shareOverlay">
+  <div class="share-modal">
+    <div class="share-modal-header">
+      <h2>🔗 Share Progress</h2>
+      <button class="share-modal-close" id="shareModalClose">✕</button>
+    </div>
+    
+    <div class="share-modal-body">
+      <!-- My Sharing Settings -->
+      <div class="share-section">
+        <div class="share-section-title">📤 My Sharing Settings</div>
+        <div class="share-toggle" id="shareToggle">
+          <span class="toggle-label">Allow others to view my progress</span>
+          <div class="toggle-switch" id="toggleSwitch">
+            <div class="toggle-knob"></div>
+          </div>
+        </div>
+        <div class="share-info-box" id="shareInfoBox" style="display: none;">
+          <strong>✅ Sharing is enabled!</strong><br>
+          Share your email with friends so they can view your study progress.
+          <div class="email-display">
+            <span id="shareableEmail">your@email.com</span>
+            <button class="copy-btn" id="copyEmailBtn">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="share-divider"></div>
+
+      <!-- View Someone's Progress -->
+      <div class="share-section">
+        <div class="share-section-title">👀 View Someone's Progress</div>
+        <form class="view-progress-form" id="viewProgressForm">
+          <div class="field">
+            <label class="field-label" for="viewerEmail">Enter their email address:</label>
+            <input 
+              type="email" 
+              id="viewerEmail" 
+              placeholder="friend@example.com" 
+              required 
+            />
+            <div class="field-error" id="viewerEmailError"></div>
+          </div>
+          <button type="submit" class="btn" style="width: 100%;">
+            View Progress
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 // Firebase configuration - uses your actual Firebase project
 const firebaseConfig = {
@@ -1087,7 +1402,13 @@ const state = {
   selectedSwatch: '#B5533C',
   editingEntryId: null,
   understandingValue: 3,
-  isLoginMode: false
+  isLoginMode: false,
+  // Share progress feature
+  viewingUserId: null,      // ID of user whose progress we're viewing
+  viewingUserEmail: null,    // Email of user we're viewing
+  isViewingShared: false,    // Flag for shared view mode
+  shareEnabled: false,       // Current user's share setting
+  unsubscribeShared: null    // Firestore unsubscribe for shared data
 };
 
 const PALETTE = ['#B5533C', '#2D6E8E', '#8A6BA1', '#C98A2B', '#5C7A4A', '#55627A', '#A24C63'];
@@ -2057,6 +2378,259 @@ const playground = {
   }
 };
 
+// Share Progress Functionality
+const shareProgress = {
+  async init() {
+    const shareBtn = el('shareBtn');
+    const shareOverlay = el('shareOverlay');
+    const shareModalClose = el('shareModalClose');
+    const shareToggle = el('shareToggle');
+    const toggleSwitch = el('toggleSwitch');
+    const viewProgressForm = el('viewProgressForm');
+    const backToMyDashboard = el('backToMyDashboard');
+    const copyEmailBtn = el('copyEmailBtn');
+
+    // Show share button when logged in
+    if (state.user) {
+      shareBtn.style.display = 'flex';
+    }
+
+    // Load user's share settings
+    await this.loadShareSettings();
+
+    // Open share modal
+    shareBtn.addEventListener('click', () => {
+      shareOverlay.classList.add('open');
+    });
+
+    // Close share modal
+    shareModalClose.addEventListener('click', () => {
+      shareOverlay.classList.remove('open');
+    });
+
+    // Close on overlay click
+    shareOverlay.addEventListener('click', (e) => {
+      if (e.target === shareOverlay) {
+        shareOverlay.classList.remove('open');
+      }
+    });
+
+    // Toggle share setting
+    shareToggle.addEventListener('click', () => this.toggleShareSetting());
+
+    // Copy email button
+    copyEmailBtn.addEventListener('click', () => this.copyEmail());
+
+    // View progress form
+    viewProgressForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      this.viewUserProgress();
+    });
+
+    // Back to my dashboard
+    backToMyDashboard.addEventListener('click', () => this.switchToMyDashboard());
+  },
+
+  async loadShareSettings() {
+    if (!state.user) return;
+
+    try {
+      const userProfileRef = db.collection('userProfiles').doc(state.user.uid);
+      const doc = await userProfileRef.get();
+
+      if (doc.exists) {
+        const data = doc.data();
+        state.shareEnabled = data.shareEnabled || false;
+        this.updateShareUI();
+      } else {
+        // Create user profile if it doesn't exist
+        await userProfileRef.set({
+          email: state.user.email,
+          shareEnabled: false,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        state.shareEnabled = false;
+        this.updateShareUI();
+      }
+    } catch (error) {
+      console.error('Error loading share settings:', error);
+    }
+  },
+
+  async toggleShareSetting() {
+    if (!state.user) return;
+
+    try {
+      const newValue = !state.shareEnabled;
+      const userProfileRef = db.collection('userProfiles').doc(state.user.uid);
+
+      await userProfileRef.set({
+        email: state.user.email,
+        shareEnabled: newValue,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+
+      state.shareEnabled = newValue;
+      this.updateShareUI();
+      showToast(newValue ? 'Sharing enabled! Others can now view your progress.' : 'Sharing disabled');
+    } catch (error) {
+      console.error('Error toggling share setting:', error);
+      showToast('Failed to update settings');
+    }
+  },
+
+  updateShareUI() {
+    const toggleSwitch = el('toggleSwitch');
+    const shareInfoBox = el('shareInfoBox');
+    const shareableEmail = el('shareableEmail');
+
+    if (state.shareEnabled) {
+      toggleSwitch.classList.add('active');
+      shareInfoBox.style.display = 'block';
+      shareableEmail.textContent = state.user ? state.user.email : '';
+    } else {
+      toggleSwitch.classList.remove('active');
+      shareInfoBox.style.display = 'none';
+    }
+  },
+
+  copyEmail() {
+    const email = state.user ? state.user.email : '';
+    navigator.clipboard.writeText(email).then(() => {
+      showToast('Email copied to clipboard!');
+    }).catch(() => {
+      showToast('Failed to copy email');
+    });
+  },
+
+  async viewUserProgress() {
+    const emailInput = el('viewerEmail');
+    const errorEl = el('viewerEmailError');
+    const targetEmail = emailInput.value.trim().toLowerCase();
+
+    if (!targetEmail) {
+      errorEl.textContent = 'Please enter an email address';
+      errorEl.classList.add('show');
+      return;
+    }
+
+    // Check if trying to view own progress
+    if (state.user && targetEmail === state.user.email.toLowerCase()) {
+      errorEl.textContent = 'You are already viewing your own progress!';
+      errorEl.classList.add('show');
+      return;
+    }
+
+    try {
+      errorEl.classList.remove('show');
+      showToast('Looking up user...');
+
+      // Query userProfiles to find user by email
+      const querySnapshot = await db.collection('userProfiles')
+        .where('email', '==', targetEmail)
+        .limit(1)
+        .get();
+
+      if (querySnapshot.empty) {
+        errorEl.textContent = 'User not found or hasn\'t signed up yet';
+        errorEl.classList.add('show');
+        return;
+      }
+
+      const userDoc = querySnapshot.docs[0];
+      const userData = userDoc.data();
+      const targetUserId = userDoc.id;
+
+      // Check if sharing is enabled
+      if (!userData.shareEnabled) {
+        errorEl.textContent = 'This user has not enabled progress sharing';
+        errorEl.classList.add('show');
+        return;
+      }
+
+      // Switch to shared view
+      state.viewingUserId = targetUserId;
+      state.viewingUserEmail = targetEmail;
+      state.isViewingShared = true;
+
+      // Close modal
+      el('shareOverlay').classList.remove('open');
+      emailInput.value = '';
+
+      // Show viewing banner
+      el('viewingUserName').textContent = targetEmail.split('@')[0];
+      el('viewingUserEmail').textContent = targetEmail;
+      el('viewingBanner').classList.add('show');
+
+      // Load shared user's data with real-time updates
+      await this.loadSharedUserData(targetUserId);
+
+      showToast('Now viewing ' + targetEmail + '\'s progress');
+    } catch (error) {
+      console.error('Error viewing progress:', error);
+      errorEl.textContent = 'Failed to load user progress. Please try again.';
+      errorEl.classList.add('show');
+    }
+  },
+
+  async loadSharedUserData(userId) {
+    // Unsubscribe from previous shared data listener if exists
+    if (state.unsubscribeShared) {
+      state.unsubscribeShared();
+      state.unsubscribeShared = null;
+    }
+
+    // Set up real-time listeners for shared user's data
+    const subjectsRef = db.collection('subjects').doc(userId).collection('items');
+    const entriesRef = db.collection('entries').doc(userId).collection('items');
+
+    // Real-time listener for subjects
+    const unsubSubjects = subjectsRef.onSnapshot((snapshot) => {
+      state.subjects = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      renderAll();
+    });
+
+    // Real-time listener for entries
+    const unsubEntries = entriesRef.orderBy('date', 'desc').onSnapshot((snapshot) => {
+      state.entries = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      renderAll();
+    });
+
+    // Store unsubscribe functions
+    state.unsubscribeShared = () => {
+      unsubSubjects();
+      unsubEntries();
+    };
+  },
+
+  async switchToMyDashboard() {
+    // Unsubscribe from shared data listeners
+    if (state.unsubscribeShared) {
+      state.unsubscribeShared();
+      state.unsubscribeShared = null;
+    }
+
+    // Reset viewing state
+    state.viewingUserId = null;
+    state.viewingUserEmail = null;
+    state.isViewingShared = false;
+
+    // Hide viewing banner
+    el('viewingBanner').classList.remove('show');
+
+    // Reload own data
+    await initializeUserData();
+
+    showToast('Back to your dashboard');
+  }
+};
+
 // Initialize application
 function init() {
   showLoadingScreen();
@@ -2083,6 +2657,9 @@ function init() {
   
   // Initialize playground
   playground.init();
+  
+  // Initialize share progress
+  shareProgress.init();
   
   // Add timeout fallback in case auth state doesn't fire
   const authTimeout = setTimeout(() => {
