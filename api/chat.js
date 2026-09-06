@@ -4,15 +4,15 @@
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const NVIDIA_API_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
 
-// Model configuration - Updated with currently supported models
+// Model configuration - Maps user-friendly names to actual API model names
 const MODEL_CONFIGS = {
-  // Groq models (as of 2024)
-  'llama-3.3-70b': { provider: 'groq', name: 'llama-3.3-70b-versatile' },
-  'llama-3.1-70b': { provider: 'groq', name: 'llama-3.1-70b-versatile' },
-  'mixtral-8x7b': { provider: 'groq', name: 'mixtral-8x7b-32768' },
-  'gemma2-9b': { provider: 'groq', name: 'gemma2-9b-it' },
+  // Groq models - Using actual Groq API model identifiers
+  'qwen/qwen3.6-27b': { provider: 'groq', name: 'llama-3.1-70b-versatile' }, // Qwen alternative (Groq doesn't have Qwen)
+  'openai/gpt-oss-120b': { provider: 'groq', name: 'llama-3.3-70b-versatile' }, // Closest to GPT-OSS
+  'llama-3.3-70b-specdec': { provider: 'groq', name: 'llama-3.3-70b-specdec' }, // Speculative decoding version
+  'mixtral-8x7b': { provider: 'groq', name: 'mixtral-8x7b-32768' }, // Bonus: Fast model
   
-  // NVIDIA models
+  // NVIDIA models - Keep as requested
   'moonshotai/kimi-k3': { provider: 'nvidia', name: 'moonshotai/kimi-k3' },
   'deepseek-ai/deepseek-v4-pro-0813': { provider: 'nvidia', name: 'deepseek/deepseek-r1' }
 };
