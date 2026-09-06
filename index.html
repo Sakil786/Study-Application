@@ -2390,13 +2390,10 @@ const shareProgress = {
     const backToMyDashboard = el('backToMyDashboard');
     const copyEmailBtn = el('copyEmailBtn');
 
-    // Show share button when logged in
+    // Load user's share settings (will be called after login)
     if (state.user) {
-      shareBtn.style.display = 'flex';
+      await this.loadShareSettings();
     }
-
-    // Load user's share settings
-    await this.loadShareSettings();
 
     // Open share modal
     shareBtn.addEventListener('click', () => {
@@ -2679,6 +2676,10 @@ function init() {
         showMainApp();
         // Show playground button
         el('playgroundBtn').style.display = 'flex';
+        // Show share button
+        el('shareBtn').style.display = 'flex';
+        // Load share settings
+        await shareProgress.loadShareSettings();
       } catch (error) {
         console.error('Error initializing user data:', error);
         showBanner('Failed to load your data. Please refresh the page.');
