@@ -1,6 +1,8 @@
 {
   "name": "study-log-app",
   "version": "1.0.0",
-  "description": "A study tracking application with Firebase backend",
-  "scripts": {}
+  "description": "A study tracking application with Firebase backend and AI chat",
+  "scripts": {},
+  "dependencies": {},
+  "type": "module"
 }
